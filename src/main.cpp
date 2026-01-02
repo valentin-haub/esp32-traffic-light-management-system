@@ -9,6 +9,7 @@ TrafficLight tl;
 QueueHandle_t q;
 TaskHandle_t hTrafficLight;
 TaskHandle_t hRequest;
+TaskHandle_t hClock;
 
 
 void taskTrafficLight(void* pvParemeters){
@@ -43,26 +44,27 @@ void taskRequest(void* pvParameters){
   }
 }
 
+void taskClock(void* pvParameters){
+    TrafficLight_EventId tick = TrafficLight_EventId_TICK;
 
-unsigned long lastTickTime = 0;
+    while(1){
+        xQueueSend(q, &tick, 0);
+
+        vTaskDelay(pdMS_TO_TICKS(1));
+    }
+}
+
+
 
 void setup() {
   Serial.begin(115200);
 
   q = xQueueCreate(20, sizeof(TrafficLight_EventId));
 
+  xTaskCreate(taskClock, "Clock Task", 1024, NULL, 3, &hClock);
   xTaskCreate(taskTrafficLight, "TrafficLight Task", 2048, NULL, 2, &hTrafficLight);
   xTaskCreate(taskRequest, "Request Task", 1024, NULL, 1, &hRequest);
-     
 }
 
 
-void loop() {
-  // Zeit-Event "TICK" senden (1 Tick pro Millisekunde)
-  if (millis() - lastTickTime >= 1) {
-    lastTickTime = millis();
-    
-    TrafficLight_EventId tick = TrafficLight_EventId_TICK;
-    xQueueSend(q, &tick, 0);
-  }
-}
+void loop() {}
