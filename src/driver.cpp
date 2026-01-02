@@ -2,44 +2,44 @@
 #include <Arduino.h>
 
 
-#define PIN_ROT 2
-#define PIN_GELB 4
-#define PIN_GRUEN 5
+#define PIN_RED 2
+#define PIN_YELLOW 4
+#define PIN_GREEN 5
 
 
 void initRedLight() {
-    pinMode(PIN_ROT, OUTPUT);
-    digitalWrite(PIN_ROT, LOW);
+    pinMode(PIN_RED, OUTPUT);
+    digitalWrite(PIN_RED, LOW);
 }
 void initYellowLight() {
-    pinMode(PIN_GELB, OUTPUT);
-    digitalWrite(PIN_GELB, LOW);
+    pinMode(PIN_YELLOW, OUTPUT);
+    digitalWrite(PIN_YELLOW, LOW);
 }
 void initGreenLight() {
-    pinMode(PIN_GRUEN, OUTPUT);
-    digitalWrite(PIN_GRUEN, LOW);
+    pinMode(PIN_GREEN, OUTPUT);
+    digitalWrite(PIN_GREEN, LOW);
 }
 
 
 void turnOnRedLight() {
-    digitalWrite(PIN_ROT, HIGH);
+    digitalWrite(PIN_RED, HIGH);
 }
 void turnOffRedLight() {
-    digitalWrite(PIN_ROT, LOW);
+    digitalWrite(PIN_RED, LOW);
 }
 
 
 void turnOnYellowLight() {
-    digitalWrite(PIN_GELB, HIGH);
+    digitalWrite(PIN_YELLOW, HIGH);
 }
 void turnOffYellowLight() {
-    digitalWrite(PIN_GELB, LOW);
+    digitalWrite(PIN_YELLOW, LOW);
 }
 
 
 void turnOnGreenLight() {
-    digitalWrite(PIN_GRUEN, HIGH);
+    digitalWrite(PIN_GREEN, HIGH);
 }
 void turnOffGreenLight() {
-    digitalWrite(PIN_GRUEN, LOW);
+    digitalWrite(PIN_GREEN, LOW);
 }
