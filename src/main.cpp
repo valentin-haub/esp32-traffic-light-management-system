@@ -68,6 +68,8 @@ void taskSerial(void* pvParameters){
     if (Serial.available() > 0){
       input = Serial.read();
 
+      if (input == '\n' || input == '\r' || input == ' ') continue;
+
       if (input == '1' || input == '2'){
         Serial.print(input);
         Serial.println();
