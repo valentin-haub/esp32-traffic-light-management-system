@@ -61,6 +61,8 @@ void loop() {
   // Zeit-Event "TICK" senden (1 Tick pro Millisekunde)
   if (millis() - lastTickTime >= 1) {
     lastTickTime = millis();
-    TrafficLight_dispatch_event(&tl, TrafficLight_EventId_TICK);
+    
+    TrafficLight_EventId tick = TrafficLight_EventId_TICK;
+    xQueueSend(q, &tick, 0);
   }
 }
