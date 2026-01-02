@@ -1,0 +1,15 @@
+.pio/
+.vscode/
+
+.DS_Store
+Thumbs.db
+
+State machine/*.cpp
+State machine/*.hpp
+State machine/*.c
+State machine/*.h
+State machine/*.json
+
+!State machine/*.plantuml
+!State machine/*.drawio
+!State machine/*.sim.html
