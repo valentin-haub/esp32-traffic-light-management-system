@@ -1,2 +1,6 @@
 # StateSmith HTML-Simulationsdatei
 *.sim.html linguist-generated=true
+
+# StateSmith PlantUML-Datei
+*.plantuml linguist-language=PlantUML
+*.plantuml linguist-detectable=true
