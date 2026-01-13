@@ -289,17 +289,53 @@ TrafficLightYellow : exit / #123; turnOffYellowLight()#59; #125;
 
 TrafficLightYellow : tick / #123; time++#59; #125;
 
+state NightMode {
+
+        BlinkOn
+
+        BlinkOn : BlinkOn
+
+        BlinkOn : enter / #123; turnOnYellowLight()#59; time = 0#59; #125;
+
+        BlinkOn : exit / #123; turnOffYellowLight()#59; #125;
+
+        BlinkOn : tick / #123; time++#59; #125;
+
+        BlinkOff
+
+        BlinkOff : BlinkOff
+
+        BlinkOff : enter / #123; time = 0#59; #125;
+
+        BlinkOff : tick / #123; time++#59; #125;
+
+        %% Initial state name as "." so that it fits in black circle shape.
+        %% See https://github.com/StateSmith/StateSmith/issues/404
+        state "." as NightMode.(InitialState)
+
+}
+
 %% Initial state name as "." so that it fits in black circle shape.
 %% See https://github.com/StateSmith/StateSmith/issues/404
 state "." as ROOT.(InitialState)
 
 TrafficLightRed --> TrafficLightRedYellow : requestGreen
 
+TrafficLightRed --> NightMode : do [brightness < threshold]
+
 TrafficLightRedYellow --> TrafficLightGreen : tick [time > 2000]
 
-TrafficLightGreen --> TrafficLightYellow : tick [time > 5000]
+TrafficLightGreen --> TrafficLightYellow : tick [time > greenTime]
 
 TrafficLightYellow --> TrafficLightRed : tick [time > 3000]
+
+NightMode --> TrafficLightRed : do [brightness > threshold]
+
+BlinkOn --> BlinkOff : tick [time > 1000]
+
+BlinkOff --> BlinkOn : tick [time > 1000]
+
+NightMode.(InitialState) --> BlinkOff
 
 ROOT.(InitialState) --> TrafficLightRed : / #123; initRedLight()#59; initYellowLight()#59; initGreenLight()#59; #125;
 
@@ -352,25 +388,29 @@ class TrafficLight
 evaluateGuard = null;
     static EventId = 
     {
-        REQUESTGREEN : 0,
-        TICK : 1,
+        DO : 0, // The `do` event is special. State event handlers do not consume this event (ancestors all get it too) unless a transition occurs.
+        REQUESTGREEN : 1,
+        TICK : 2,
     }
     static { Object.freeze(this.EventId); }
     
-    static EventIdCount = 2;
+    static EventIdCount = 3;
     static { Object.freeze(this.EventIdCount); }
     
     static StateId = 
     {
         ROOT : 0,
-        TRAFFICLIGHTGREEN : 1,
-        TRAFFICLIGHTRED : 2,
-        TRAFFICLIGHTREDYELLOW : 3,
-        TRAFFICLIGHTYELLOW : 4,
+        NIGHTMODE : 1,
+        BLINKOFF : 2,
+        BLINKON : 3,
+        TRAFFICLIGHTGREEN : 4,
+        TRAFFICLIGHTRED : 5,
+        TRAFFICLIGHTREDYELLOW : 6,
+        TRAFFICLIGHTYELLOW : 7,
     }
     static { Object.freeze(this.StateId); }
     
-    static StateIdCount = 5;
+    static StateIdCount = 8;
     static { Object.freeze(this.StateIdCount); }
     
     // Used internally by state machine. Feel free to inspect, but don't modify.
@@ -391,12 +431,12 @@ evaluateGuard = null;
             // ROOT.<InitialState> is a pseudo state and cannot have an `enter` trigger.
             
             // ROOT.<InitialState> behavior
-            // uml: / { this.tracer?.log("⚡ FSM would execute action: " + "initRedLight(); initYellowLight(); initGreenLight();");this.tracer?.edgeTransition("edge4"); } TransitionTo(TrafficLightRed)
+            // uml: / { this.tracer?.log("⚡ FSM would execute action: " + "initRedLight(); initYellowLight(); initGreenLight();");this.tracer?.edgeTransition("edge9"); } TransitionTo(TrafficLightRed)
             {
                 // Step 1: Exit states until we reach `ROOT` state (Least Common Ancestor for transition). Already at LCA, no exiting required.
                 
-                // Step 2: Transition action: `this.tracer?.log("⚡ FSM would execute action: " + "initRedLight(); initYellowLight(); initGreenLight();");this.tracer?.edgeTransition("edge4");`.
-                this.tracer?.log("⚡ FSM would execute action: " + "initRedLight(); initYellowLight(); initGreenLight();");this.tracer?.edgeTransition("edge4");
+                // Step 2: Transition action: `this.tracer?.log("⚡ FSM would execute action: " + "initRedLight(); initYellowLight(); initGreenLight();");this.tracer?.edgeTransition("edge9");`.
+                this.tracer?.log("⚡ FSM would execute action: " + "initRedLight(); initYellowLight(); initGreenLight();");this.tracer?.edgeTransition("edge9");
                 
                 // Step 3: Enter/move towards transition target `TrafficLightRed`.
                 this.#TRAFFICLIGHTRED_enter();
@@ -418,6 +458,32 @@ evaluateGuard = null;
                 // No events handled by this state (or its ancestors).
                 break;
             
+            // STATE: NightMode
+            case TrafficLight.StateId.NIGHTMODE:
+                switch (eventId)
+                {
+                    case TrafficLight.EventId.DO: this.#NIGHTMODE_do(); break;
+                }
+                break;
+            
+            // STATE: BlinkOff
+            case TrafficLight.StateId.BLINKOFF:
+                switch (eventId)
+                {
+                    case TrafficLight.EventId.TICK: this.#BLINKOFF_tick(); break;
+                    case TrafficLight.EventId.DO: this.#NIGHTMODE_do(); break; // First ancestor handler for this event
+                }
+                break;
+            
+            // STATE: BlinkOn
+            case TrafficLight.StateId.BLINKON:
+                switch (eventId)
+                {
+                    case TrafficLight.EventId.TICK: this.#BLINKON_tick(); break;
+                    case TrafficLight.EventId.DO: this.#NIGHTMODE_do(); break; // First ancestor handler for this event
+                }
+                break;
+            
             // STATE: TrafficLightGreen
             case TrafficLight.StateId.TRAFFICLIGHTGREEN:
                 switch (eventId)
@@ -432,6 +498,7 @@ evaluateGuard = null;
                 {
                     case TrafficLight.EventId.TICK: this.#TRAFFICLIGHTRED_tick(); break;
                     case TrafficLight.EventId.REQUESTGREEN: this.#TRAFFICLIGHTRED_requestgreen(); break;
+                    case TrafficLight.EventId.DO: this.#TRAFFICLIGHTRED_do(); break;
                 }
                 break;
             
@@ -462,6 +529,12 @@ evaluateGuard = null;
         {
             switch (this.stateId)
             {
+                case TrafficLight.StateId.NIGHTMODE: this.#NIGHTMODE_exit(); break;
+                
+                case TrafficLight.StateId.BLINKOFF: this.#BLINKOFF_exit(); break;
+                
+                case TrafficLight.StateId.BLINKON: this.#BLINKON_exit(); break;
+                
                 case TrafficLight.StateId.TRAFFICLIGHTGREEN: this.#TRAFFICLIGHTGREEN_exit(); break;
                 
                 case TrafficLight.StateId.TRAFFICLIGHTRED: this.#TRAFFICLIGHTRED_exit(); break;
@@ -483,6 +556,194 @@ evaluateGuard = null;
     #ROOT_enter()
     {
         this.stateId = TrafficLight.StateId.ROOT;
+    }
+    
+    
+    ////////////////////////////////////////////////////////////////////////////////
+    // event handlers for state NIGHTMODE
+    ////////////////////////////////////////////////////////////////////////////////
+    
+    #NIGHTMODE_enter()
+    {
+        this.stateId = TrafficLight.StateId.NIGHTMODE;
+        
+        // NightMode behavior
+        // uml: enter / { this.tracer?.enterState('NightMode'); }
+        {
+            // Step 1: execute action `this.tracer?.enterState('NightMode');`
+            this.tracer?.enterState('NightMode');
+        } // end of behavior for NightMode
+    }
+    
+    #NIGHTMODE_exit()
+    {
+        // NightMode behavior
+        // uml: exit / { this.tracer?.exitState('NightMode'); }
+        {
+            // Step 1: execute action `this.tracer?.exitState('NightMode');`
+            this.tracer?.exitState('NightMode');
+        } // end of behavior for NightMode
+        
+        this.stateId = TrafficLight.StateId.ROOT;
+    }
+    
+    #NIGHTMODE_do()
+    {
+        // NightMode behavior
+        // uml: do [this.tracer?.log("🛡️ User evaluating guard: " + "brightness > threshold") || this.evaluateGuard("NightMode","do [brightness > threshold] TransitionTo(TrafficLightRed)")] / { this.tracer?.edgeTransition("edge5"); } TransitionTo(TrafficLightRed)
+        if (this.tracer?.log("🛡️ User evaluating guard: " + "brightness > threshold") || this.evaluateGuard("NightMode","do [brightness > threshold] TransitionTo(TrafficLightRed)"))
+        {
+            // Step 1: Exit states until we reach `ROOT` state (Least Common Ancestor for transition).
+            this.#exitUpToStateHandler(TrafficLight.StateId.ROOT);
+            
+            // Step 2: Transition action: `this.tracer?.edgeTransition("edge5");`.
+            this.tracer?.edgeTransition("edge5");
+            
+            // Step 3: Enter/move towards transition target `TrafficLightRed`.
+            this.#TRAFFICLIGHTRED_enter();
+            
+            // Step 4: complete transition. Ends event dispatch. No other behaviors are checked.
+            return;
+        } // end of behavior for NightMode
+        
+        // No ancestor handles this event.
+    }
+    
+    
+    ////////////////////////////////////////////////////////////////////////////////
+    // event handlers for state BLINKOFF
+    ////////////////////////////////////////////////////////////////////////////////
+    
+    #BLINKOFF_enter()
+    {
+        this.stateId = TrafficLight.StateId.BLINKOFF;
+        
+        // BlinkOff behavior
+        // uml: enter / { this.tracer?.enterState('BlinkOff'); }
+        {
+            // Step 1: execute action `this.tracer?.enterState('BlinkOff');`
+            this.tracer?.enterState('BlinkOff');
+        } // end of behavior for BlinkOff
+        
+        // BlinkOff behavior
+        // uml: enter / { this.tracer?.log("⚡ FSM would execute action: " + "time = 0;"); }
+        {
+            // Step 1: execute action `this.tracer?.log("⚡ FSM would execute action: " + "time = 0;");`
+            this.tracer?.log("⚡ FSM would execute action: " + "time = 0;");
+        } // end of behavior for BlinkOff
+    }
+    
+    #BLINKOFF_exit()
+    {
+        // BlinkOff behavior
+        // uml: exit / { this.tracer?.exitState('BlinkOff'); }
+        {
+            // Step 1: execute action `this.tracer?.exitState('BlinkOff');`
+            this.tracer?.exitState('BlinkOff');
+        } // end of behavior for BlinkOff
+        
+        this.stateId = TrafficLight.StateId.NIGHTMODE;
+    }
+    
+    #BLINKOFF_tick()
+    {
+        // BlinkOff behavior
+        // uml: tick / { this.tracer?.log("⚡ FSM would execute action: " + "time++;"); }
+        {
+            // Step 1: execute action `this.tracer?.log("⚡ FSM would execute action: " + "time++;");`
+            this.tracer?.log("⚡ FSM would execute action: " + "time++;");
+        } // end of behavior for BlinkOff
+        
+        // BlinkOff behavior
+        // uml: tick [this.tracer?.log("🛡️ User evaluating guard: " + "time > 1000") || this.evaluateGuard("BlinkOff","tick [time > 1000] TransitionTo(BlinkOn)")] / { this.tracer?.edgeTransition("edge7"); } TransitionTo(BlinkOn)
+        if (this.tracer?.log("🛡️ User evaluating guard: " + "time > 1000") || this.evaluateGuard("BlinkOff","tick [time > 1000] TransitionTo(BlinkOn)"))
+        {
+            // Step 1: Exit states until we reach `NightMode` state (Least Common Ancestor for transition).
+            this.#BLINKOFF_exit();
+            
+            // Step 2: Transition action: `this.tracer?.edgeTransition("edge7");`.
+            this.tracer?.edgeTransition("edge7");
+            
+            // Step 3: Enter/move towards transition target `BlinkOn`.
+            this.#BLINKON_enter();
+            
+            // Step 4: complete transition. Ends event dispatch. No other behaviors are checked.
+            return;
+        } // end of behavior for BlinkOff
+        
+        // No ancestor handles this event.
+    }
+    
+    
+    ////////////////////////////////////////////////////////////////////////////////
+    // event handlers for state BLINKON
+    ////////////////////////////////////////////////////////////////////////////////
+    
+    #BLINKON_enter()
+    {
+        this.stateId = TrafficLight.StateId.BLINKON;
+        
+        // BlinkOn behavior
+        // uml: enter / { this.tracer?.enterState('BlinkOn'); }
+        {
+            // Step 1: execute action `this.tracer?.enterState('BlinkOn');`
+            this.tracer?.enterState('BlinkOn');
+        } // end of behavior for BlinkOn
+        
+        // BlinkOn behavior
+        // uml: enter / { this.tracer?.log("⚡ FSM would execute action: " + "turnOnYellowLight(); time = 0;"); }
+        {
+            // Step 1: execute action `this.tracer?.log("⚡ FSM would execute action: " + "turnOnYellowLight(); time = 0;");`
+            this.tracer?.log("⚡ FSM would execute action: " + "turnOnYellowLight(); time = 0;");
+        } // end of behavior for BlinkOn
+    }
+    
+    #BLINKON_exit()
+    {
+        // BlinkOn behavior
+        // uml: exit / { this.tracer?.log("⚡ FSM would execute action: " + "turnOffYellowLight();"); }
+        {
+            // Step 1: execute action `this.tracer?.log("⚡ FSM would execute action: " + "turnOffYellowLight();");`
+            this.tracer?.log("⚡ FSM would execute action: " + "turnOffYellowLight();");
+        } // end of behavior for BlinkOn
+        
+        // BlinkOn behavior
+        // uml: exit / { this.tracer?.exitState('BlinkOn'); }
+        {
+            // Step 1: execute action `this.tracer?.exitState('BlinkOn');`
+            this.tracer?.exitState('BlinkOn');
+        } // end of behavior for BlinkOn
+        
+        this.stateId = TrafficLight.StateId.NIGHTMODE;
+    }
+    
+    #BLINKON_tick()
+    {
+        // BlinkOn behavior
+        // uml: tick / { this.tracer?.log("⚡ FSM would execute action: " + "time++;"); }
+        {
+            // Step 1: execute action `this.tracer?.log("⚡ FSM would execute action: " + "time++;");`
+            this.tracer?.log("⚡ FSM would execute action: " + "time++;");
+        } // end of behavior for BlinkOn
+        
+        // BlinkOn behavior
+        // uml: tick [this.tracer?.log("🛡️ User evaluating guard: " + "time > 1000") || this.evaluateGuard("BlinkOn","tick [time > 1000] TransitionTo(BlinkOff)")] / { this.tracer?.edgeTransition("edge6"); } TransitionTo(BlinkOff)
+        if (this.tracer?.log("🛡️ User evaluating guard: " + "time > 1000") || this.evaluateGuard("BlinkOn","tick [time > 1000] TransitionTo(BlinkOff)"))
+        {
+            // Step 1: Exit states until we reach `NightMode` state (Least Common Ancestor for transition).
+            this.#BLINKON_exit();
+            
+            // Step 2: Transition action: `this.tracer?.edgeTransition("edge6");`.
+            this.tracer?.edgeTransition("edge6");
+            
+            // Step 3: Enter/move towards transition target `BlinkOff`.
+            this.#BLINKOFF_enter();
+            
+            // Step 4: complete transition. Ends event dispatch. No other behaviors are checked.
+            return;
+        } // end of behavior for BlinkOn
+        
+        // No ancestor handles this event.
     }
     
     
@@ -538,14 +799,14 @@ evaluateGuard = null;
         } // end of behavior for TrafficLightGreen
         
         // TrafficLightGreen behavior
-        // uml: tick [this.tracer?.log("🛡️ User evaluating guard: " + "time > 5000") || this.evaluateGuard("TrafficLightGreen","tick [time > 5000] TransitionTo(TrafficLightYellow)")] / { this.tracer?.edgeTransition("edge2"); } TransitionTo(TrafficLightYellow)
-        if (this.tracer?.log("🛡️ User evaluating guard: " + "time > 5000") || this.evaluateGuard("TrafficLightGreen","tick [time > 5000] TransitionTo(TrafficLightYellow)"))
+        // uml: tick [this.tracer?.log("🛡️ User evaluating guard: " + "time > greenTime") || this.evaluateGuard("TrafficLightGreen","tick [time > greenTime] TransitionTo(TrafficLightYellow)")] / { this.tracer?.edgeTransition("edge3"); } TransitionTo(TrafficLightYellow)
+        if (this.tracer?.log("🛡️ User evaluating guard: " + "time > greenTime") || this.evaluateGuard("TrafficLightGreen","tick [time > greenTime] TransitionTo(TrafficLightYellow)"))
         {
             // Step 1: Exit states until we reach `ROOT` state (Least Common Ancestor for transition).
             this.#TRAFFICLIGHTGREEN_exit();
             
-            // Step 2: Transition action: `this.tracer?.edgeTransition("edge2");`.
-            this.tracer?.edgeTransition("edge2");
+            // Step 2: Transition action: `this.tracer?.edgeTransition("edge3");`.
+            this.tracer?.edgeTransition("edge3");
             
             // Step 3: Enter/move towards transition target `TrafficLightYellow`.
             this.#TRAFFICLIGHTYELLOW_enter();
@@ -598,6 +859,40 @@ evaluateGuard = null;
         } // end of behavior for TrafficLightRed
         
         this.stateId = TrafficLight.StateId.ROOT;
+    }
+    
+    #TRAFFICLIGHTRED_do()
+    {
+        // TrafficLightRed behavior
+        // uml: do [this.tracer?.log("🛡️ User evaluating guard: " + "brightness < threshold") || this.evaluateGuard("TrafficLightRed","do [brightness < threshold] TransitionTo(NightMode)")] / { this.tracer?.edgeTransition("edge1"); } TransitionTo(NightMode)
+        if (this.tracer?.log("🛡️ User evaluating guard: " + "brightness < threshold") || this.evaluateGuard("TrafficLightRed","do [brightness < threshold] TransitionTo(NightMode)"))
+        {
+            // Step 1: Exit states until we reach `ROOT` state (Least Common Ancestor for transition).
+            this.#TRAFFICLIGHTRED_exit();
+            
+            // Step 2: Transition action: `this.tracer?.edgeTransition("edge1");`.
+            this.tracer?.edgeTransition("edge1");
+            
+            // Step 3: Enter/move towards transition target `NightMode`.
+            this.#NIGHTMODE_enter();
+            
+            // NightMode.<InitialState> behavior
+            // uml: / { this.tracer?.edgeTransition("edge8"); } TransitionTo(BlinkOff)
+            {
+                // Step 1: Exit states until we reach `NightMode` state (Least Common Ancestor for transition). Already at LCA, no exiting required.
+                
+                // Step 2: Transition action: `this.tracer?.edgeTransition("edge8");`.
+                this.tracer?.edgeTransition("edge8");
+                
+                // Step 3: Enter/move towards transition target `BlinkOff`.
+                this.#BLINKOFF_enter();
+                
+                // Step 4: complete transition. Ends event dispatch. No other behaviors are checked.
+                return;
+            } // end of behavior for NightMode.<InitialState>
+        } // end of behavior for TrafficLightRed
+        
+        // No ancestor handles this event.
     }
     
     #TRAFFICLIGHTRED_requestgreen()
@@ -686,14 +981,14 @@ evaluateGuard = null;
         } // end of behavior for TrafficLightRedYellow
         
         // TrafficLightRedYellow behavior
-        // uml: tick [this.tracer?.log("🛡️ User evaluating guard: " + "time > 2000") || this.evaluateGuard("TrafficLightRedYellow","tick [time > 2000] TransitionTo(TrafficLightGreen)")] / { this.tracer?.edgeTransition("edge1"); } TransitionTo(TrafficLightGreen)
+        // uml: tick [this.tracer?.log("🛡️ User evaluating guard: " + "time > 2000") || this.evaluateGuard("TrafficLightRedYellow","tick [time > 2000] TransitionTo(TrafficLightGreen)")] / { this.tracer?.edgeTransition("edge2"); } TransitionTo(TrafficLightGreen)
         if (this.tracer?.log("🛡️ User evaluating guard: " + "time > 2000") || this.evaluateGuard("TrafficLightRedYellow","tick [time > 2000] TransitionTo(TrafficLightGreen)"))
         {
             // Step 1: Exit states until we reach `ROOT` state (Least Common Ancestor for transition).
             this.#TRAFFICLIGHTREDYELLOW_exit();
             
-            // Step 2: Transition action: `this.tracer?.edgeTransition("edge1");`.
-            this.tracer?.edgeTransition("edge1");
+            // Step 2: Transition action: `this.tracer?.edgeTransition("edge2");`.
+            this.tracer?.edgeTransition("edge2");
             
             // Step 3: Enter/move towards transition target `TrafficLightGreen`.
             this.#TRAFFICLIGHTGREEN_enter();
@@ -758,14 +1053,14 @@ evaluateGuard = null;
         } // end of behavior for TrafficLightYellow
         
         // TrafficLightYellow behavior
-        // uml: tick [this.tracer?.log("🛡️ User evaluating guard: " + "time > 3000") || this.evaluateGuard("TrafficLightYellow","tick [time > 3000] TransitionTo(TrafficLightRed)")] / { this.tracer?.edgeTransition("edge3"); } TransitionTo(TrafficLightRed)
+        // uml: tick [this.tracer?.log("🛡️ User evaluating guard: " + "time > 3000") || this.evaluateGuard("TrafficLightYellow","tick [time > 3000] TransitionTo(TrafficLightRed)")] / { this.tracer?.edgeTransition("edge4"); } TransitionTo(TrafficLightRed)
         if (this.tracer?.log("🛡️ User evaluating guard: " + "time > 3000") || this.evaluateGuard("TrafficLightYellow","tick [time > 3000] TransitionTo(TrafficLightRed)"))
         {
             // Step 1: Exit states until we reach `ROOT` state (Least Common Ancestor for transition).
             this.#TRAFFICLIGHTYELLOW_exit();
             
-            // Step 2: Transition action: `this.tracer?.edgeTransition("edge3");`.
-            this.tracer?.edgeTransition("edge3");
+            // Step 2: Transition action: `this.tracer?.edgeTransition("edge4");`.
+            this.tracer?.edgeTransition("edge4");
             
             // Step 3: Enter/move towards transition target `TrafficLightRed`.
             this.#TRAFFICLIGHTRED_enter();
@@ -783,6 +1078,9 @@ evaluateGuard = null;
         switch (id)
         {
             case TrafficLight.StateId.ROOT: return "ROOT";
+            case TrafficLight.StateId.NIGHTMODE: return "NIGHTMODE";
+            case TrafficLight.StateId.BLINKOFF: return "BLINKOFF";
+            case TrafficLight.StateId.BLINKON: return "BLINKON";
             case TrafficLight.StateId.TRAFFICLIGHTGREEN: return "TRAFFICLIGHTGREEN";
             case TrafficLight.StateId.TRAFFICLIGHTRED: return "TRAFFICLIGHTRED";
             case TrafficLight.StateId.TRAFFICLIGHTREDYELLOW: return "TRAFFICLIGHTREDYELLOW";
@@ -796,6 +1094,7 @@ evaluateGuard = null;
     {
         switch (id)
         {
+            case TrafficLight.EventId.DO: return "DO";
             case TrafficLight.EventId.REQUESTGREEN: return "REQUESTGREEN";
             case TrafficLight.EventId.TICK: return "TICK";
             default: return "?";
@@ -836,11 +1135,12 @@ evaluateGuard = null;
             center: true
         });
 
-        const diagramEventNamesArray = ['requestGreen', 'tick', ];
+        const diagramEventNamesArray = ['do', 'requestGreen', 'tick', ];
 
         // Mapping from state to available events
         const stateEventsMapping = {
   "TrafficLightRed": [
+    "do",
     "requestGreen",
     "tick"
   ],
@@ -851,6 +1151,17 @@ evaluateGuard = null;
     "tick"
   ],
   "TrafficLightYellow": [
+    "tick"
+  ],
+  "NightMode": [
+    "do"
+  ],
+  "BlinkOn": [
+    "do",
+    "tick"
+  ],
+  "BlinkOff": [
+    "do",
     "tick"
   ]
 };
