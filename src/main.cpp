@@ -4,6 +4,7 @@
 
 #define PIN_REQUEST 13
 #define PIN_LDR 34
+#define PIN_POTI 35
 
 
 TrafficLight tl;
@@ -26,6 +27,14 @@ void taskTrafficLight(void* pvParemeters){
       TrafficLight_dispatch_event(&tl, event);
     }
   }
+}
+
+void setGreenTime(){
+  int potiValue = analogRead(PIN_POTI);
+
+  int greenTime = map(0, 4095, 1000, 10000);
+
+  tl.vars.greenTime = greenTime;
 }
 
 void taskRequest(void* pvParameters){
