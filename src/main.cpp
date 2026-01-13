@@ -2,6 +2,7 @@
 #include "TrafficLight.hpp"
 
 
+// Pins
 #define PIN_REQUEST 13
 #define PIN_LDR 34
 #define PIN_POTI 35
@@ -22,9 +23,11 @@ void taskTrafficLight(void* pvParemeters){
 
   TrafficLight_ctor(&tl);
 
-  // Standardwerte setzen
+  // Startwerte setzen
   tl.vars.time = 0;
-  tl.vars.brightness = 4095;
+  tl.vars.greenTime = 5000; // 5 Sekunden
+  tl.vars.threshold = 2000; // 2 Sekunden
+  tl.vars.brightness = 4095; // Start als "hell"
 
   TrafficLight_start(&tl);
   
