@@ -50,7 +50,7 @@ void taskRequest(void* pvParameters){
 
     if (lastRequestState == HIGH && currentRequestState == LOW) {
       TrafficLight_EventId request = TrafficLight_EventId_REQUESTGREEN;
-      refreshGreenTime;
+      refreshGreenTime();
       xQueueSend(q, &request, 0);
     }
     lastRequestState = currentRequestState;
