@@ -50,7 +50,7 @@ TrafficLightRedYellow --> TrafficLightGreen : tick [time > 2000]
 TrafficLightGreen: enter / turnOnGreenLight(); time = 0;
 TrafficLightGreen: exit  / turnOffGreenLight();
 TrafficLightGreen: tick / time++;
-TrafficLightGreen --> TrafficLightYellow : tick [time > 5000]
+TrafficLightGreen --> TrafficLightYellow : tick [time > greenTime]
 
 ' TrafficLightYellow
 TrafficLightYellow: enter / turnOnYellowLight(); time = 0;
@@ -73,6 +73,7 @@ FileTop = """
     """
 AutoExpandedVars = """
     uint16_t time;
+    uint16_t greenTime
     uint16_t brightness;
     """
 
