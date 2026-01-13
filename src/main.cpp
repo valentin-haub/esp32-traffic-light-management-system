@@ -38,20 +38,11 @@ void taskTrafficLight(void* pvParemeters){
   }
 }
 
-void refreshGreenTime(){
-  int potiValue = analogRead(PIN_POTI);
-
-  int greenTime = map(potiValue, 0, 4095, 1000, 10000); // 1 - 10 Sekunden
-
-  tl.vars.greenTime = greenTime;
-}
-
 void taskRequest(void* pvParameters){
   int lastRequestState = HIGH;
   int currentRequestState;
 
   pinMode(PIN_REQUEST, INPUT_PULLUP);
-  pinMode(PIN_POTI, INPUT);
 
   while(1){
     currentRequestState = digitalRead(PIN_REQUEST);
@@ -148,7 +139,7 @@ void setup() {
 
   xTaskCreate(taskClock, "Clock Task", 1024, NULL, 3, &hClock);
   xTaskCreate(taskTrafficLight, "TrafficLight Task", 2048, NULL, 2, &hTrafficLight);
-  
+
   xTaskCreate(taskRequest, "Request Task", 2048, NULL, 1, &hRequest);
   xTaskCreate(taskSerial, "Serial Task", 4096, NULL, 1, &hSerial);
   xTaskCreate(taskSensors, "Sensors Task", 1024, NULL, 1, &hSensors);
