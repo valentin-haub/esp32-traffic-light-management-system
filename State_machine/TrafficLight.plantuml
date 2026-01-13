@@ -9,6 +9,24 @@ state TrafficLightRedYellow
 state TrafficLightGreen
 state TrafficLightYellow
 
+state NightMode {
+    state BlinkOn
+    state BlinkOff
+
+    [*] --> BlinkOff
+
+    ' BlinkOff
+    BlinkOff: enter / time = 0;
+    BlinkOff: tick / time++;
+    BlinkOff --> BlinkOn : tick [time > 1000]
+
+    ' BlinkOn
+    BlinkOn: enter / turnOnYellowLight; time = 0;
+    BlinkOn: exit / turnOffYellowLight;
+    BlinkOn: tick / time++;
+    BlinkOn --> BlinkOff : tick [time > 1000]
+}
+
 
 ' ///////////////////////// STATE HANDLERS /////////////////////////
 ' Syntax: https://github.com/StateSmith/StateSmith/wiki/Behaviors
