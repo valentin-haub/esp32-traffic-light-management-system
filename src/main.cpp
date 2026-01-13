@@ -15,7 +15,7 @@ TaskHandle_t hTrafficLight;
 TaskHandle_t hRequest;
 TaskHandle_t hClock;
 TaskHandle_t hSerial;
-TaskHandle_t hNightMode;
+TaskHandle_t hSensors;
 
 
 void taskTrafficLight(void* pvParemeters){
@@ -58,7 +58,6 @@ void taskRequest(void* pvParameters){
 
     if (lastRequestState == HIGH && currentRequestState == LOW) {
       TrafficLight_EventId request = TrafficLight_EventId_REQUESTGREEN;
-      refreshGreenTime();
       xQueueSend(q, &request, 0);
     }
     lastRequestState = currentRequestState;
@@ -103,7 +102,6 @@ void taskSerial(void* pvParameters){
         }
         else if (input == '2'){
           TrafficLight_EventId request = TrafficLight_EventId_REQUESTGREEN;
-          refreshGreenTime();
           xQueueSend(q, &request, 0);
           Serial.print("Request wurde gesetzt.");
         }
@@ -124,15 +122,20 @@ void taskSerial(void* pvParameters){
   }
 }
 
-void taskNightMode(void* pvParameters){
-  tl.vars.threshold = 2000;
-
+void taskSensors(void* pvParameters){
   pinMode(PIN_LDR, INPUT);
+  pinMode(PIN_POTI, INPUT);
 
   while(1){
+    // Brightness aktualisieren
     tl.vars.brightness = analogRead(PIN_LDR);
 
-    vTaskDelay(pdMS_TO_TICKS(500));
+    // Grünphasenzeit aktualisieren
+    int potiValue = analogRead(PIN_POTI);
+    int greenTime = map(potiValue, 0, 4095, 1000, 10000); // 1 - 10 Sekunden
+    tl.vars.greenTime = greenTime;
+
+    vTaskDelay(pdMS_TO_TICKS(200));
   }
 }
 
@@ -147,7 +150,7 @@ void setup() {
   xTaskCreate(taskTrafficLight, "TrafficLight Task", 2048, NULL, 2, &hTrafficLight);
   xTaskCreate(taskRequest, "Request Task", 1024, NULL, 1, &hRequest);
   xTaskCreate(taskSerial, "Serial Task", 4096, NULL, 1, &hSerial);
-  xTaskCreate(taskNightMode, "Night Mode Task", 1024, NULL, 1, &hNightMode);
+  xTaskCreate(taskSensors, "Night Mode Task", 1024, NULL, 1, &hSensors);
 }
 
 
