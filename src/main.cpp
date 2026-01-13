@@ -3,6 +3,8 @@
 
 
 #define PIN_REQUEST 13
+#define PIN_LDR 34
+
 
 TrafficLight tl;
 
