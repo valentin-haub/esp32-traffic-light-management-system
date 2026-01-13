@@ -148,9 +148,10 @@ void setup() {
 
   xTaskCreate(taskClock, "Clock Task", 1024, NULL, 3, &hClock);
   xTaskCreate(taskTrafficLight, "TrafficLight Task", 2048, NULL, 2, &hTrafficLight);
-  xTaskCreate(taskRequest, "Request Task", 1024, NULL, 1, &hRequest);
+  
+  xTaskCreate(taskRequest, "Request Task", 2048, NULL, 1, &hRequest);
   xTaskCreate(taskSerial, "Serial Task", 4096, NULL, 1, &hSerial);
-  xTaskCreate(taskSensors, "Night Mode Task", 1024, NULL, 1, &hSensors);
+  xTaskCreate(taskSensors, "Sensors Task", 1024, NULL, 1, &hSensors);
 }
 
 
