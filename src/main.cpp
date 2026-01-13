@@ -103,6 +103,18 @@ void taskSerial(void* pvParameters){
   }
 }
 
+void taskNightMode(void* pvParameters){
+  tl.vars.threshold = 2000;
+
+  pinMode(PIN_LDR, INPUT);
+
+  while(1){
+    tl.vars.brightness = analogRead(PIN_LDR);
+
+    vTaskDelay(pdMS_TO_TICKS(500));
+  }
+}
+
 
 
 void setup() {
