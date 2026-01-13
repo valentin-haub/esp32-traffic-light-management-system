@@ -14,6 +14,7 @@ TaskHandle_t hTrafficLight;
 TaskHandle_t hRequest;
 TaskHandle_t hClock;
 TaskHandle_t hSerial;
+TaskHandle_t hNightMode;
 
 
 void taskTrafficLight(void* pvParemeters){
@@ -137,6 +138,7 @@ void setup() {
   xTaskCreate(taskTrafficLight, "TrafficLight Task", 2048, NULL, 2, &hTrafficLight);
   xTaskCreate(taskRequest, "Request Task", 1024, NULL, 1, &hRequest);
   xTaskCreate(taskSerial, "Serial Task", 4096, NULL, 1, &hSerial);
+  xTaskCreate(taskNightMode, "Night Mode Task", 1024, NULL, 1, &hNightMode);
 }
 
 
