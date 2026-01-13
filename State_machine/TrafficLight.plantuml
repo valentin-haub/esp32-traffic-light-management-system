@@ -38,7 +38,7 @@ TrafficLightRed: enter / turnOnRedLight(); time = 0;
 TrafficLightRed: exit  / turnOffRedLight();
 TrafficLightRed: tick / time++;
 TrafficLightRed --> TrafficLightRedYellow : requestGreen
-TrafficLightRed --> NightMode : [brightness < 250]
+TrafficLightRed --> NightMode : [brightness < threshhold]
 
 ' TrafficLightRedYellow
 TrafficLightRedYellow: enter / turnOnRedLight(); turnOnYellowLight(); time = 0;
@@ -59,7 +59,7 @@ TrafficLightYellow: tick / time++;
 TrafficLightYellow --> TrafficLightRed : tick [time > 3000]
 
 ' NightMode
-NightMode --> TrafficLightRed : [brigthness > 300]
+NightMode --> TrafficLightRed : [brigthness > threshhold]
 
 
 ' //////////////////////// StateSmith config ////////////////////////
@@ -73,8 +73,9 @@ FileTop = """
     """
 AutoExpandedVars = """
     uint16_t time;
-    uint16_t greenTime
+    uint16_t greenTime;
     uint16_t brightness;
+    uint16_t threshold;
     """
 
 [RenderConfig.C]
