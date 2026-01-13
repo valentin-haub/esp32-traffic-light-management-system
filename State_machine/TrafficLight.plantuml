@@ -21,8 +21,8 @@ state NightMode {
     BlinkOff --> BlinkOn : tick [time > 1000]
 
     ' BlinkOn
-    BlinkOn: enter / turnOnYellowLight; time = 0;
-    BlinkOn: exit / turnOffYellowLight;
+    BlinkOn: enter / turnOnYellowLight(); time = 0;
+    BlinkOn: exit / turnOffYellowLight();
     BlinkOn: tick / time++;
     BlinkOn --> BlinkOff : tick [time > 1000]
 }
@@ -38,7 +38,7 @@ TrafficLightRed: enter / turnOnRedLight(); time = 0;
 TrafficLightRed: exit  / turnOffRedLight();
 TrafficLightRed: tick / time++;
 TrafficLightRed --> TrafficLightRedYellow : requestGreen
-TrafficLightRed --> NightMode : [brightness < threshhold]
+TrafficLightRed --> NightMode : [brightness < threshold]
 
 ' TrafficLightRedYellow
 TrafficLightRedYellow: enter / turnOnRedLight(); turnOnYellowLight(); time = 0;
@@ -59,7 +59,7 @@ TrafficLightYellow: tick / time++;
 TrafficLightYellow --> TrafficLightRed : tick [time > 3000]
 
 ' NightMode
-NightMode --> TrafficLightRed : [brigthness > threshhold]
+NightMode --> TrafficLightRed : [brightness > threshold]
 
 
 ' //////////////////////// StateSmith config ////////////////////////
