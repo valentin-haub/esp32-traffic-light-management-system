@@ -21,6 +21,11 @@ void taskTrafficLight(void* pvParemeters){
   TrafficLight_EventId event;
 
   TrafficLight_ctor(&tl);
+
+  // Standardwerte setzen
+  tl.vars.time = 0;
+  tl.vars.brightness = 4095;
+
   TrafficLight_start(&tl);
   
   while (1){
@@ -33,7 +38,7 @@ void taskTrafficLight(void* pvParemeters){
 void refreshGreenTime(){
   int potiValue = analogRead(PIN_POTI);
 
-  int greenTime = map(potiValue, 0, 4095, 1000, 10000);
+  int greenTime = map(potiValue, 0, 4095, 1000, 10000); // 1 - 10 Sekunden
 
   tl.vars.greenTime = greenTime;
 }
