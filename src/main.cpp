@@ -103,6 +103,7 @@ void taskSerial(void* pvParameters){
         }
         else if (input == '2'){
           TrafficLight_EventId request = TrafficLight_EventId_REQUESTGREEN;
+          refreshGreenTime();
           xQueueSend(q, &request, 0);
           Serial.print("Request wurde gesetzt.");
         }
