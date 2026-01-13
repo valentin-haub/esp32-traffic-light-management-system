@@ -29,10 +29,10 @@ void taskTrafficLight(void* pvParemeters){
   }
 }
 
-void setGreenTime(){
+void refreshGreenTime(){
   int potiValue = analogRead(PIN_POTI);
 
-  int greenTime = map(0, 4095, 1000, 10000);
+  int greenTime = map(potiValue, 0, 4095, 1000, 10000);
 
   tl.vars.greenTime = greenTime;
 }
@@ -42,12 +42,14 @@ void taskRequest(void* pvParameters){
   int currentRequestState;
 
   pinMode(PIN_REQUEST, INPUT_PULLUP);
+  pinMode(PIN_POTI, INPUT);
 
   while(1){
     currentRequestState = digitalRead(PIN_REQUEST);
 
     if (lastRequestState == HIGH && currentRequestState == LOW) {
       TrafficLight_EventId request = TrafficLight_EventId_REQUESTGREEN;
+      refreshGreenTime;
       xQueueSend(q, &request, 0);
     }
     lastRequestState = currentRequestState;
