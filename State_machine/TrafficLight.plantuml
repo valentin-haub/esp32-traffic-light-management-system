@@ -19,14 +19,14 @@ state NightMode {
     BlinkOff: enter / time = 0;
     BlinkOff: tick / time++;
     BlinkOff --> BlinkOn : tick [time > 1000]
-    BlinkOff --> TrafficLightRed : tick [brightness < threshold - 50]
+    BlinkOff --> TrafficLightRed : tick [brightness > threshold + 100]
 
     ' BlinkOn
     BlinkOn: enter / turnOnYellowLight(); time = 0;
     BlinkOn: exit / turnOffYellowLight();
     BlinkOn: tick / time++;
     BlinkOn --> BlinkOff : tick [time > 1000]
-    BlinkOn --> TrafficLightRed : tick [brightness < threshold - 50]
+    BlinkOn --> TrafficLightRed : tick [brightness > threshold + 100]
 }
 
 
@@ -40,7 +40,7 @@ TrafficLightRed: enter / turnOnRedLight(); time = 0;
 TrafficLightRed: exit  / turnOffRedLight();
 TrafficLightRed: tick / time++;
 TrafficLightRed --> TrafficLightRedYellow : requestGreen
-TrafficLightRed --> NightMode : tick [brightness > threshold + 50]
+TrafficLightRed --> NightMode : tick [brightness < threshold - 100]
 
 ' TrafficLightRedYellow
 TrafficLightRedYellow: enter / turnOnRedLight(); turnOnYellowLight(); time = 0;
