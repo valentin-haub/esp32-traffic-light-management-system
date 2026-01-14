@@ -321,7 +321,7 @@ state "." as ROOT.(InitialState)
 
 TrafficLightRed --> TrafficLightRedYellow : requestGreen
 
-TrafficLightRed --> NightMode : tick [darkness > threshold + 50]
+TrafficLightRed --> NightMode : tick [brightness < threshold - 100]
 
 TrafficLightRedYellow --> TrafficLightGreen : tick [time > 2000]
 
@@ -331,11 +331,11 @@ TrafficLightYellow --> TrafficLightRed : tick [time > 3000]
 
 BlinkOn --> BlinkOff : tick [time > 1000]
 
-BlinkOn --> TrafficLightRed : tick [darkness < threshold - 50]
+BlinkOn --> TrafficLightRed : tick [brightness > threshold + 100]
 
 BlinkOff --> BlinkOn : tick [time > 1000]
 
-BlinkOff --> TrafficLightRed : tick [darkness < threshold - 50]
+BlinkOff --> TrafficLightRed : tick [brightness > threshold + 100]
 
 NightMode.(InitialState) --> BlinkOff
 
@@ -645,8 +645,8 @@ evaluateGuard = null;
         } // end of behavior for BlinkOff
         
         // BlinkOff behavior
-        // uml: tick [this.tracer?.log("🛡️ User evaluating guard: " + "darkness < threshold - 50") || this.evaluateGuard("BlinkOff","tick [darkness < threshold - 50] TransitionTo(TrafficLightRed)")] / { this.tracer?.edgeTransition("edge8"); } TransitionTo(TrafficLightRed)
-        if (this.tracer?.log("🛡️ User evaluating guard: " + "darkness < threshold - 50") || this.evaluateGuard("BlinkOff","tick [darkness < threshold - 50] TransitionTo(TrafficLightRed)"))
+        // uml: tick [this.tracer?.log("🛡️ User evaluating guard: " + "brightness > threshold + 100") || this.evaluateGuard("BlinkOff","tick [brightness > threshold + 100] TransitionTo(TrafficLightRed)")] / { this.tracer?.edgeTransition("edge8"); } TransitionTo(TrafficLightRed)
+        if (this.tracer?.log("🛡️ User evaluating guard: " + "brightness > threshold + 100") || this.evaluateGuard("BlinkOff","tick [brightness > threshold + 100] TransitionTo(TrafficLightRed)"))
         {
             // Step 1: Exit states until we reach `ROOT` state (Least Common Ancestor for transition).
             this.#exitUpToStateHandler(TrafficLight.StateId.ROOT);
@@ -734,8 +734,8 @@ evaluateGuard = null;
         } // end of behavior for BlinkOn
         
         // BlinkOn behavior
-        // uml: tick [this.tracer?.log("🛡️ User evaluating guard: " + "darkness < threshold - 50") || this.evaluateGuard("BlinkOn","tick [darkness < threshold - 50] TransitionTo(TrafficLightRed)")] / { this.tracer?.edgeTransition("edge6"); } TransitionTo(TrafficLightRed)
-        if (this.tracer?.log("🛡️ User evaluating guard: " + "darkness < threshold - 50") || this.evaluateGuard("BlinkOn","tick [darkness < threshold - 50] TransitionTo(TrafficLightRed)"))
+        // uml: tick [this.tracer?.log("🛡️ User evaluating guard: " + "brightness > threshold + 100") || this.evaluateGuard("BlinkOn","tick [brightness > threshold + 100] TransitionTo(TrafficLightRed)")] / { this.tracer?.edgeTransition("edge6"); } TransitionTo(TrafficLightRed)
+        if (this.tracer?.log("🛡️ User evaluating guard: " + "brightness > threshold + 100") || this.evaluateGuard("BlinkOn","tick [brightness > threshold + 100] TransitionTo(TrafficLightRed)"))
         {
             // Step 1: Exit states until we reach `ROOT` state (Least Common Ancestor for transition).
             this.#exitUpToStateHandler(TrafficLight.StateId.ROOT);
@@ -899,8 +899,8 @@ evaluateGuard = null;
         } // end of behavior for TrafficLightRed
         
         // TrafficLightRed behavior
-        // uml: tick [this.tracer?.log("🛡️ User evaluating guard: " + "darkness > threshold + 50") || this.evaluateGuard("TrafficLightRed","tick [darkness > threshold + 50] TransitionTo(NightMode)")] / { this.tracer?.edgeTransition("edge1"); } TransitionTo(NightMode)
-        if (this.tracer?.log("🛡️ User evaluating guard: " + "darkness > threshold + 50") || this.evaluateGuard("TrafficLightRed","tick [darkness > threshold + 50] TransitionTo(NightMode)"))
+        // uml: tick [this.tracer?.log("🛡️ User evaluating guard: " + "brightness < threshold - 100") || this.evaluateGuard("TrafficLightRed","tick [brightness < threshold - 100] TransitionTo(NightMode)")] / { this.tracer?.edgeTransition("edge1"); } TransitionTo(NightMode)
+        if (this.tracer?.log("🛡️ User evaluating guard: " + "brightness < threshold - 100") || this.evaluateGuard("TrafficLightRed","tick [brightness < threshold - 100] TransitionTo(NightMode)"))
         {
             // Step 1: Exit states until we reach `ROOT` state (Least Common Ancestor for transition).
             this.#TRAFFICLIGHTRED_exit();
