@@ -129,8 +129,8 @@ void taskSensors(void* pvParameters){
     tl.vars.greenTime = greenTime;
 
     // Vorübergehend: Ausgabe der Werte
-    Serial.print("LDR (Dunkelheit): ");
-    Serial.print(ldrValue);
+    Serial.print("LDR (Helligkeit): ");
+    Serial.print(tl.vars.brightness);
     Serial.print(" | Poti (Raw): ");
     Serial.print(potiValue);
     Serial.print(" -> GreenTime: ");
