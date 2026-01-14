@@ -275,7 +275,7 @@ static void BLINKOFF_tick(TrafficLight* sm)
     
     // BlinkOff behavior
     // uml: tick [brightness > threshold + 100] TransitionTo(TrafficLightRed)
-    if (brightness > sm->vars.threshold + 100)
+    if (sm->vars.brightness > sm->vars.threshold + 100)
     {
         // Step 1: Exit states until we reach `ROOT` state (Least Common Ancestor for transition).
         exit_up_to_state_handler(sm, TrafficLight_StateId_ROOT);
@@ -348,7 +348,7 @@ static void BLINKON_tick(TrafficLight* sm)
     
     // BlinkOn behavior
     // uml: tick [brightness > threshold + 100] TransitionTo(TrafficLightRed)
-    if (brightness > sm->vars.threshold + 100)
+    if (sm->vars.brightness > sm->vars.threshold + 100)
     {
         // Step 1: Exit states until we reach `ROOT` state (Least Common Ancestor for transition).
         exit_up_to_state_handler(sm, TrafficLight_StateId_ROOT);
@@ -482,7 +482,7 @@ static void TRAFFICLIGHTRED_tick(TrafficLight* sm)
     
     // TrafficLightRed behavior
     // uml: tick [brightness < threshold - 100] TransitionTo(NightMode)
-    if (brightness < sm->vars.threshold - 100)
+    if (sm->vars.brightness < sm->vars.threshold - 100)
     {
         // Step 1: Exit states until we reach `ROOT` state (Least Common Ancestor for transition).
         TRAFFICLIGHTRED_exit(sm);

@@ -45,7 +45,7 @@ typedef struct TrafficLight_Vars
 {
     uint16_t time;
     uint16_t greenTime;
-    uint16_t darkness;
+    uint16_t brightness;
     uint16_t threshold;
 } TrafficLight_Vars;
 
