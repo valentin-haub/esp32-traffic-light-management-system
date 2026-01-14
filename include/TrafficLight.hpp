@@ -9,14 +9,13 @@
 
 typedef enum TrafficLight_EventId
 {
-    TrafficLight_EventId_DO = 0, // The `do` event is special. State event handlers do not consume this event (ancestors all get it too) unless a transition occurs.
-    TrafficLight_EventId_REQUESTGREEN = 1,
-    TrafficLight_EventId_TICK = 2
+    TrafficLight_EventId_REQUESTGREEN = 0,
+    TrafficLight_EventId_TICK = 1
 } TrafficLight_EventId;
 
 enum
 {
-    TrafficLight_EventIdCount = 3
+    TrafficLight_EventIdCount = 2
 };
 
 typedef enum TrafficLight_StateId

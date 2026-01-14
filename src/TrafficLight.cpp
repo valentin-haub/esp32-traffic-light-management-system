@@ -18,7 +18,7 @@ static void NIGHTMODE_enter(TrafficLight* sm);
 
 static void NIGHTMODE_exit(TrafficLight* sm);
 
-static void NIGHTMODE_do(TrafficLight* sm);
+static void NIGHTMODE_tick(TrafficLight* sm);
 
 static void BLINKOFF_enter(TrafficLight* sm);
 
@@ -41,8 +41,6 @@ static void TRAFFICLIGHTGREEN_tick(TrafficLight* sm);
 static void TRAFFICLIGHTRED_enter(TrafficLight* sm);
 
 static void TRAFFICLIGHTRED_exit(TrafficLight* sm);
-
-static void TRAFFICLIGHTRED_do(TrafficLight* sm);
 
 static void TRAFFICLIGHTRED_requestgreen(TrafficLight* sm);
 
@@ -113,7 +111,7 @@ void TrafficLight_dispatch_event(TrafficLight* sm, TrafficLight_EventId event_id
         case TrafficLight_StateId_NIGHTMODE:
             switch (event_id)
             {
-                case TrafficLight_EventId_DO: NIGHTMODE_do(sm); break;
+                case TrafficLight_EventId_TICK: NIGHTMODE_tick(sm); break;
                 
                 default: break; // to avoid "unused enumeration value in switch" warning
             }
@@ -124,7 +122,6 @@ void TrafficLight_dispatch_event(TrafficLight* sm, TrafficLight_EventId event_id
             switch (event_id)
             {
                 case TrafficLight_EventId_TICK: BLINKOFF_tick(sm); break;
-                case TrafficLight_EventId_DO: NIGHTMODE_do(sm); break; // First ancestor handler for this event
                 
                 default: break; // to avoid "unused enumeration value in switch" warning
             }
@@ -135,7 +132,6 @@ void TrafficLight_dispatch_event(TrafficLight* sm, TrafficLight_EventId event_id
             switch (event_id)
             {
                 case TrafficLight_EventId_TICK: BLINKON_tick(sm); break;
-                case TrafficLight_EventId_DO: NIGHTMODE_do(sm); break; // First ancestor handler for this event
                 
                 default: break; // to avoid "unused enumeration value in switch" warning
             }
@@ -157,7 +153,6 @@ void TrafficLight_dispatch_event(TrafficLight* sm, TrafficLight_EventId event_id
             {
                 case TrafficLight_EventId_TICK: TRAFFICLIGHTRED_tick(sm); break;
                 case TrafficLight_EventId_REQUESTGREEN: TRAFFICLIGHTRED_requestgreen(sm); break;
-                case TrafficLight_EventId_DO: TRAFFICLIGHTRED_do(sm); break;
                 
                 default: break; // to avoid "unused enumeration value in switch" warning
             }
@@ -238,10 +233,10 @@ static void NIGHTMODE_exit(TrafficLight* sm)
     sm->state_id = TrafficLight_StateId_ROOT;
 }
 
-static void NIGHTMODE_do(TrafficLight* sm)
+static void NIGHTMODE_tick(TrafficLight* sm)
 {
     // NightMode behavior
-    // uml: do [brightness > threshold] TransitionTo(TrafficLightRed)
+    // uml: tick [brightness > threshold] TransitionTo(TrafficLightRed)
     if (sm->vars.brightness > sm->vars.threshold)
     {
         // Step 1: Exit states until we reach `ROOT` state (Least Common Ancestor for transition).
@@ -283,9 +278,13 @@ static void BLINKOFF_exit(TrafficLight* sm)
 
 static void BLINKOFF_tick(TrafficLight* sm)
 {
+    bool consume_event = false;
+    
     // BlinkOff behavior
     // uml: tick / { time++; }
     {
+        // Consume event `tick`.
+        consume_event = true;
         // Step 1: execute action `time++;`
         sm->vars.time++;
     } // end of behavior for BlinkOff
@@ -306,7 +305,11 @@ static void BLINKOFF_tick(TrafficLight* sm)
         return;
     } // end of behavior for BlinkOff
     
-    // No ancestor handles this event.
+    // Check if event has been consumed before calling ancestor handler.
+    if (!consume_event)
+    {
+        NIGHTMODE_tick(sm);
+    }
 }
 
 
@@ -340,9 +343,13 @@ static void BLINKON_exit(TrafficLight* sm)
 
 static void BLINKON_tick(TrafficLight* sm)
 {
+    bool consume_event = false;
+    
     // BlinkOn behavior
     // uml: tick / { time++; }
     {
+        // Consume event `tick`.
+        consume_event = true;
         // Step 1: execute action `time++;`
         sm->vars.time++;
     } // end of behavior for BlinkOn
@@ -363,7 +370,11 @@ static void BLINKON_tick(TrafficLight* sm)
         return;
     } // end of behavior for BlinkOn
     
-    // No ancestor handles this event.
+    // Check if event has been consumed before calling ancestor handler.
+    if (!consume_event)
+    {
+        NIGHTMODE_tick(sm);
+    }
 }
 
 
@@ -452,38 +463,6 @@ static void TRAFFICLIGHTRED_exit(TrafficLight* sm)
     sm->state_id = TrafficLight_StateId_ROOT;
 }
 
-static void TRAFFICLIGHTRED_do(TrafficLight* sm)
-{
-    // TrafficLightRed behavior
-    // uml: do [brightness < threshold] TransitionTo(NightMode)
-    if (sm->vars.brightness < sm->vars.threshold)
-    {
-        // Step 1: Exit states until we reach `ROOT` state (Least Common Ancestor for transition).
-        TRAFFICLIGHTRED_exit(sm);
-        
-        // Step 2: Transition action: ``.
-        
-        // Step 3: Enter/move towards transition target `NightMode`.
-        NIGHTMODE_enter(sm);
-        
-        // NightMode.<InitialState> behavior
-        // uml: TransitionTo(BlinkOff)
-        {
-            // Step 1: Exit states until we reach `NightMode` state (Least Common Ancestor for transition). Already at LCA, no exiting required.
-            
-            // Step 2: Transition action: ``.
-            
-            // Step 3: Enter/move towards transition target `BlinkOff`.
-            BLINKOFF_enter(sm);
-            
-            // Step 4: complete transition. Ends event dispatch. No other behaviors are checked.
-            return;
-        } // end of behavior for NightMode.<InitialState>
-    } // end of behavior for TrafficLightRed
-    
-    // No ancestor handles this event.
-}
-
 static void TRAFFICLIGHTRED_requestgreen(TrafficLight* sm)
 {
     // TrafficLightRed behavior
@@ -511,6 +490,33 @@ static void TRAFFICLIGHTRED_tick(TrafficLight* sm)
     {
         // Step 1: execute action `time++;`
         sm->vars.time++;
+    } // end of behavior for TrafficLightRed
+    
+    // TrafficLightRed behavior
+    // uml: tick [brightness < threshold] TransitionTo(NightMode)
+    if (sm->vars.brightness < sm->vars.threshold)
+    {
+        // Step 1: Exit states until we reach `ROOT` state (Least Common Ancestor for transition).
+        TRAFFICLIGHTRED_exit(sm);
+        
+        // Step 2: Transition action: ``.
+        
+        // Step 3: Enter/move towards transition target `NightMode`.
+        NIGHTMODE_enter(sm);
+        
+        // NightMode.<InitialState> behavior
+        // uml: TransitionTo(BlinkOff)
+        {
+            // Step 1: Exit states until we reach `NightMode` state (Least Common Ancestor for transition). Already at LCA, no exiting required.
+            
+            // Step 2: Transition action: ``.
+            
+            // Step 3: Enter/move towards transition target `BlinkOff`.
+            BLINKOFF_enter(sm);
+            
+            // Step 4: complete transition. Ends event dispatch. No other behaviors are checked.
+            return;
+        } // end of behavior for NightMode.<InitialState>
     } // end of behavior for TrafficLightRed
     
     // No ancestor handles this event.
@@ -652,7 +658,6 @@ char const * TrafficLight_event_id_to_string(TrafficLight_EventId id)
 {
     switch (id)
     {
-        case TrafficLight_EventId_DO: return "DO";
         case TrafficLight_EventId_REQUESTGREEN: return "REQUESTGREEN";
         case TrafficLight_EventId_TICK: return "TICK";
         default: return "?";
