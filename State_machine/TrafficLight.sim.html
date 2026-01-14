@@ -321,7 +321,7 @@ state "." as ROOT.(InitialState)
 
 TrafficLightRed --> TrafficLightRedYellow : requestGreen
 
-TrafficLightRed --> NightMode : tick [brightness < threshold]
+TrafficLightRed --> NightMode : tick [darkness > threshold + 50]
 
 TrafficLightRedYellow --> TrafficLightGreen : tick [time > 2000]
 
@@ -329,11 +329,13 @@ TrafficLightGreen --> TrafficLightYellow : tick [time > greenTime]
 
 TrafficLightYellow --> TrafficLightRed : tick [time > 3000]
 
-NightMode --> TrafficLightRed : tick [brightness > threshold]
-
 BlinkOn --> BlinkOff : tick [time > 1000]
 
+BlinkOn --> TrafficLightRed : tick [darkness < threshold - 50]
+
 BlinkOff --> BlinkOn : tick [time > 1000]
+
+BlinkOff --> TrafficLightRed : tick [darkness < threshold - 50]
 
 NightMode.(InitialState) --> BlinkOff
 
@@ -430,12 +432,12 @@ evaluateGuard = null;
             // ROOT.<InitialState> is a pseudo state and cannot have an `enter` trigger.
             
             // ROOT.<InitialState> behavior
-            // uml: / { this.tracer?.log("⚡ FSM would execute action: " + "initRedLight(); initYellowLight(); initGreenLight();");this.tracer?.edgeTransition("edge9"); } TransitionTo(TrafficLightRed)
+            // uml: / { this.tracer?.log("⚡ FSM would execute action: " + "initRedLight(); initYellowLight(); initGreenLight();");this.tracer?.edgeTransition("edge10"); } TransitionTo(TrafficLightRed)
             {
                 // Step 1: Exit states until we reach `ROOT` state (Least Common Ancestor for transition). Already at LCA, no exiting required.
                 
-                // Step 2: Transition action: `this.tracer?.log("⚡ FSM would execute action: " + "initRedLight(); initYellowLight(); initGreenLight();");this.tracer?.edgeTransition("edge9");`.
-                this.tracer?.log("⚡ FSM would execute action: " + "initRedLight(); initYellowLight(); initGreenLight();");this.tracer?.edgeTransition("edge9");
+                // Step 2: Transition action: `this.tracer?.log("⚡ FSM would execute action: " + "initRedLight(); initYellowLight(); initGreenLight();");this.tracer?.edgeTransition("edge10");`.
+                this.tracer?.log("⚡ FSM would execute action: " + "initRedLight(); initYellowLight(); initGreenLight();");this.tracer?.edgeTransition("edge10");
                 
                 // Step 3: Enter/move towards transition target `TrafficLightRed`.
                 this.#TRAFFICLIGHTRED_enter();
@@ -459,10 +461,7 @@ evaluateGuard = null;
             
             // STATE: NightMode
             case TrafficLight.StateId.NIGHTMODE:
-                switch (eventId)
-                {
-                    case TrafficLight.EventId.TICK: this.#NIGHTMODE_tick(); break;
-                }
+                // No events handled by this state (or its ancestors).
                 break;
             
             // STATE: BlinkOff
@@ -583,28 +582,6 @@ evaluateGuard = null;
         this.stateId = TrafficLight.StateId.ROOT;
     }
     
-    #NIGHTMODE_tick()
-    {
-        // NightMode behavior
-        // uml: tick [this.tracer?.log("🛡️ User evaluating guard: " + "brightness > threshold") || this.evaluateGuard("NightMode","tick [brightness > threshold] TransitionTo(TrafficLightRed)")] / { this.tracer?.edgeTransition("edge5"); } TransitionTo(TrafficLightRed)
-        if (this.tracer?.log("🛡️ User evaluating guard: " + "brightness > threshold") || this.evaluateGuard("NightMode","tick [brightness > threshold] TransitionTo(TrafficLightRed)"))
-        {
-            // Step 1: Exit states until we reach `ROOT` state (Least Common Ancestor for transition).
-            this.#exitUpToStateHandler(TrafficLight.StateId.ROOT);
-            
-            // Step 2: Transition action: `this.tracer?.edgeTransition("edge5");`.
-            this.tracer?.edgeTransition("edge5");
-            
-            // Step 3: Enter/move towards transition target `TrafficLightRed`.
-            this.#TRAFFICLIGHTRED_enter();
-            
-            // Step 4: complete transition. Ends event dispatch. No other behaviors are checked.
-            return;
-        } // end of behavior for NightMode
-        
-        // No ancestor handles this event.
-    }
-    
     
     ////////////////////////////////////////////////////////////////////////////////
     // event handlers for state BLINKOFF
@@ -643,13 +620,9 @@ evaluateGuard = null;
     
     #BLINKOFF_tick()
     {
-        let consume_event = false;
-        
         // BlinkOff behavior
         // uml: tick / { this.tracer?.log("⚡ FSM would execute action: " + "time++;"); }
         {
-            // Consume event `tick`.
-            consume_event = true;
             // Step 1: execute action `this.tracer?.log("⚡ FSM would execute action: " + "time++;");`
             this.tracer?.log("⚡ FSM would execute action: " + "time++;");
         } // end of behavior for BlinkOff
@@ -671,11 +644,24 @@ evaluateGuard = null;
             return;
         } // end of behavior for BlinkOff
         
-        // Check if event has been consumed before calling ancestor handler.
-        if (!consume_event)
+        // BlinkOff behavior
+        // uml: tick [this.tracer?.log("🛡️ User evaluating guard: " + "darkness < threshold - 50") || this.evaluateGuard("BlinkOff","tick [darkness < threshold - 50] TransitionTo(TrafficLightRed)")] / { this.tracer?.edgeTransition("edge8"); } TransitionTo(TrafficLightRed)
+        if (this.tracer?.log("🛡️ User evaluating guard: " + "darkness < threshold - 50") || this.evaluateGuard("BlinkOff","tick [darkness < threshold - 50] TransitionTo(TrafficLightRed)"))
         {
-            this.#NIGHTMODE_tick();
-        }
+            // Step 1: Exit states until we reach `ROOT` state (Least Common Ancestor for transition).
+            this.#exitUpToStateHandler(TrafficLight.StateId.ROOT);
+            
+            // Step 2: Transition action: `this.tracer?.edgeTransition("edge8");`.
+            this.tracer?.edgeTransition("edge8");
+            
+            // Step 3: Enter/move towards transition target `TrafficLightRed`.
+            this.#TRAFFICLIGHTRED_enter();
+            
+            // Step 4: complete transition. Ends event dispatch. No other behaviors are checked.
+            return;
+        } // end of behavior for BlinkOff
+        
+        // No ancestor handles this event.
     }
     
     
@@ -723,26 +709,22 @@ evaluateGuard = null;
     
     #BLINKON_tick()
     {
-        let consume_event = false;
-        
         // BlinkOn behavior
         // uml: tick / { this.tracer?.log("⚡ FSM would execute action: " + "time++;"); }
         {
-            // Consume event `tick`.
-            consume_event = true;
             // Step 1: execute action `this.tracer?.log("⚡ FSM would execute action: " + "time++;");`
             this.tracer?.log("⚡ FSM would execute action: " + "time++;");
         } // end of behavior for BlinkOn
         
         // BlinkOn behavior
-        // uml: tick [this.tracer?.log("🛡️ User evaluating guard: " + "time > 1000") || this.evaluateGuard("BlinkOn","tick [time > 1000] TransitionTo(BlinkOff)")] / { this.tracer?.edgeTransition("edge6"); } TransitionTo(BlinkOff)
+        // uml: tick [this.tracer?.log("🛡️ User evaluating guard: " + "time > 1000") || this.evaluateGuard("BlinkOn","tick [time > 1000] TransitionTo(BlinkOff)")] / { this.tracer?.edgeTransition("edge5"); } TransitionTo(BlinkOff)
         if (this.tracer?.log("🛡️ User evaluating guard: " + "time > 1000") || this.evaluateGuard("BlinkOn","tick [time > 1000] TransitionTo(BlinkOff)"))
         {
             // Step 1: Exit states until we reach `NightMode` state (Least Common Ancestor for transition).
             this.#BLINKON_exit();
             
-            // Step 2: Transition action: `this.tracer?.edgeTransition("edge6");`.
-            this.tracer?.edgeTransition("edge6");
+            // Step 2: Transition action: `this.tracer?.edgeTransition("edge5");`.
+            this.tracer?.edgeTransition("edge5");
             
             // Step 3: Enter/move towards transition target `BlinkOff`.
             this.#BLINKOFF_enter();
@@ -751,11 +733,24 @@ evaluateGuard = null;
             return;
         } // end of behavior for BlinkOn
         
-        // Check if event has been consumed before calling ancestor handler.
-        if (!consume_event)
+        // BlinkOn behavior
+        // uml: tick [this.tracer?.log("🛡️ User evaluating guard: " + "darkness < threshold - 50") || this.evaluateGuard("BlinkOn","tick [darkness < threshold - 50] TransitionTo(TrafficLightRed)")] / { this.tracer?.edgeTransition("edge6"); } TransitionTo(TrafficLightRed)
+        if (this.tracer?.log("🛡️ User evaluating guard: " + "darkness < threshold - 50") || this.evaluateGuard("BlinkOn","tick [darkness < threshold - 50] TransitionTo(TrafficLightRed)"))
         {
-            this.#NIGHTMODE_tick();
-        }
+            // Step 1: Exit states until we reach `ROOT` state (Least Common Ancestor for transition).
+            this.#exitUpToStateHandler(TrafficLight.StateId.ROOT);
+            
+            // Step 2: Transition action: `this.tracer?.edgeTransition("edge6");`.
+            this.tracer?.edgeTransition("edge6");
+            
+            // Step 3: Enter/move towards transition target `TrafficLightRed`.
+            this.#TRAFFICLIGHTRED_enter();
+            
+            // Step 4: complete transition. Ends event dispatch. No other behaviors are checked.
+            return;
+        } // end of behavior for BlinkOn
+        
+        // No ancestor handles this event.
     }
     
     
@@ -904,8 +899,8 @@ evaluateGuard = null;
         } // end of behavior for TrafficLightRed
         
         // TrafficLightRed behavior
-        // uml: tick [this.tracer?.log("🛡️ User evaluating guard: " + "brightness < threshold") || this.evaluateGuard("TrafficLightRed","tick [brightness < threshold] TransitionTo(NightMode)")] / { this.tracer?.edgeTransition("edge1"); } TransitionTo(NightMode)
-        if (this.tracer?.log("🛡️ User evaluating guard: " + "brightness < threshold") || this.evaluateGuard("TrafficLightRed","tick [brightness < threshold] TransitionTo(NightMode)"))
+        // uml: tick [this.tracer?.log("🛡️ User evaluating guard: " + "darkness > threshold + 50") || this.evaluateGuard("TrafficLightRed","tick [darkness > threshold + 50] TransitionTo(NightMode)")] / { this.tracer?.edgeTransition("edge1"); } TransitionTo(NightMode)
+        if (this.tracer?.log("🛡️ User evaluating guard: " + "darkness > threshold + 50") || this.evaluateGuard("TrafficLightRed","tick [darkness > threshold + 50] TransitionTo(NightMode)"))
         {
             // Step 1: Exit states until we reach `ROOT` state (Least Common Ancestor for transition).
             this.#TRAFFICLIGHTRED_exit();
@@ -917,12 +912,12 @@ evaluateGuard = null;
             this.#NIGHTMODE_enter();
             
             // NightMode.<InitialState> behavior
-            // uml: / { this.tracer?.edgeTransition("edge8"); } TransitionTo(BlinkOff)
+            // uml: / { this.tracer?.edgeTransition("edge9"); } TransitionTo(BlinkOff)
             {
                 // Step 1: Exit states until we reach `NightMode` state (Least Common Ancestor for transition). Already at LCA, no exiting required.
                 
-                // Step 2: Transition action: `this.tracer?.edgeTransition("edge8");`.
-                this.tracer?.edgeTransition("edge8");
+                // Step 2: Transition action: `this.tracer?.edgeTransition("edge9");`.
+                this.tracer?.edgeTransition("edge9");
                 
                 // Step 3: Enter/move towards transition target `BlinkOff`.
                 this.#BLINKOFF_enter();
@@ -1158,9 +1153,7 @@ evaluateGuard = null;
   "TrafficLightYellow": [
     "tick"
   ],
-  "NightMode": [
-    "tick"
-  ],
+  "NightMode": [],
   "BlinkOn": [
     "tick"
   ],
