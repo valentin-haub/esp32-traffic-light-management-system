@@ -19,14 +19,14 @@ state NightMode {
     BlinkOff: enter / time = 0;
     BlinkOff: tick / time++;
     BlinkOff --> BlinkOn : tick [time > 1000]
-    BlinkOff --> TrafficLightRed : tick [brightness > threshold]
+    BlinkOff --> TrafficLightRed : tick [darkness < threshold]
 
     ' BlinkOn
     BlinkOn: enter / turnOnYellowLight(); time = 0;
     BlinkOn: exit / turnOffYellowLight();
     BlinkOn: tick / time++;
     BlinkOn --> BlinkOff : tick [time > 1000]
-    BlinkOn --> TrafficLightRed : tick [brightness > threshold]
+    BlinkOn --> TrafficLightRed : tick [darkness < threshold]
 }
 
 
@@ -40,7 +40,7 @@ TrafficLightRed: enter / turnOnRedLight(); time = 0;
 TrafficLightRed: exit  / turnOffRedLight();
 TrafficLightRed: tick / time++;
 TrafficLightRed --> TrafficLightRedYellow : requestGreen
-TrafficLightRed --> NightMode : tick [brightness < threshold]
+TrafficLightRed --> NightMode : tick [darkness > threshold]
 
 ' TrafficLightRedYellow
 TrafficLightRedYellow: enter / turnOnRedLight(); turnOnYellowLight(); time = 0;
@@ -74,7 +74,7 @@ FileTop = """
 AutoExpandedVars = """
     uint16_t time;
     uint16_t greenTime;
-    uint16_t brightness;
+    uint16_t darkness;
     uint16_t threshold;
     """
 
