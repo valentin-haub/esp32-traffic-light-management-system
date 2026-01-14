@@ -26,7 +26,7 @@ void taskTrafficLight(void* pvParemeters){
   // Startwerte setzen
   tl.vars.time = 0;
   tl.vars.greenTime = 5000; // 5 Sekunden
-  tl.vars.darkness = 0; // Start als "hell"
+  tl.vars.brightness = 4095; // Start als "hell"
   tl.vars.threshold = 2000;
 
   TrafficLight_start(&tl);
@@ -120,7 +120,8 @@ void taskSensors(void* pvParameters){
   while(1){
     // Brightness aktualisieren
     int ldrValue = analogRead(PIN_LDR);
-    tl.vars.darkness = ldrValue;
+    int brightness = map(ldrValue, 0, 4095, 4095, 0);
+    tl.vars.brightness = brightness;
 
     // Grünphasenzeit aktualisieren
     int potiValue = analogRead(PIN_POTI);
