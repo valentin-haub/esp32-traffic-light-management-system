@@ -38,7 +38,7 @@ TrafficLightRed: enter / turnOnRedLight(); time = 0;
 TrafficLightRed: exit  / turnOffRedLight();
 TrafficLightRed: tick / time++;
 TrafficLightRed --> TrafficLightRedYellow : requestGreen
-TrafficLightRed --> NightMode : [brightness < threshold]
+TrafficLightRed --> NightMode : tick [brightness < threshold]
 
 ' TrafficLightRedYellow
 TrafficLightRedYellow: enter / turnOnRedLight(); turnOnYellowLight(); time = 0;
@@ -59,7 +59,7 @@ TrafficLightYellow: tick / time++;
 TrafficLightYellow --> TrafficLightRed : tick [time > 3000]
 
 ' NightMode
-NightMode --> TrafficLightRed : [brightness > threshold]
+NightMode --> TrafficLightRed : tick [brightness > threshold]
 
 
 ' //////////////////////// StateSmith config ////////////////////////
