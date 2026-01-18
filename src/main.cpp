@@ -3,9 +3,9 @@
 
 
 // Pins
-#define PIN_REQUEST 13
-#define PIN_LDR 34
-#define PIN_POTI 35
+#define PIN_REQUEST 15
+#define PIN_LDR 12
+#define PIN_POTI 13
 
 
 TrafficLight tl;

@@ -2,9 +2,9 @@
 #include <Arduino.h>
 
 
-#define PIN_RED 2
+#define PIN_RED 5
 #define PIN_YELLOW 4
-#define PIN_GREEN 5
+#define PIN_GREEN 2
 
 
 void initRedLight() {
