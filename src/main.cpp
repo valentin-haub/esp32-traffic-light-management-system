@@ -78,7 +78,7 @@ void taskTrafficLight2(void* pvParemeters){
   
   while (1){
     if (xQueueReceive(q2, &event, portMAX_DELAY) == pdPASS){
-      TrafficLight_dispatch_event(&tl1, event);
+      TrafficLight_dispatch_event(&tl2, event);
     }
   }
 }
