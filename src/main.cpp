@@ -172,6 +172,9 @@ void taskSerial(void* pvParameters){
 
           Serial.print(tlChoose);
 
+          while (Serial.available() == 0){
+            vTaskDelay(pdMS_TO_TICKS(10));
+          }
           input = Serial.read();
           if (input == '\n' || input == '\r' || input == ' ') continue;
           if (input == '1' || input == '2'){
