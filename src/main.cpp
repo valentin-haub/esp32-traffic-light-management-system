@@ -2,8 +2,18 @@
 #include "TrafficLight.hpp"
 
 
-// Pins
-#define PIN_REQUEST 15
+// PINs
+#define PIN_RED_1 5
+#define PIN_YELLOW_1 4
+#define PIN_GREEN_1 2
+
+#define PIN_RED_2 0
+#define PIN_YELLOW_2 0
+#define PIN_GREEN_2 0
+
+#define PIN_REQUEST_1 15
+#define PIN_REQUEST_2 0
+
 #define PIN_LDR 12
 #define PIN_POTI 13
 
@@ -22,6 +32,11 @@ void taskTrafficLight(void* pvParemeters){
   TrafficLight_EventId event;
 
   TrafficLight_ctor(&tl1);
+
+  // Pins setzen
+  tl1.vars.pinRed = PIN_RED_1;
+  tl1.vars.pinYellow = PIN_YELLOW_1;
+  tl1.vars.pinGreen = PIN_GREEN_1;
 
   // Startwerte setzen
   tl1.vars.time = 0;
@@ -42,10 +57,10 @@ void taskRequest(void* pvParameters){
   int lastRequestState = HIGH;
   int currentRequestState;
 
-  pinMode(PIN_REQUEST, INPUT_PULLUP);
+  pinMode(PIN_REQUEST_1, INPUT_PULLUP);
 
   while(1){
-    currentRequestState = digitalRead(PIN_REQUEST);
+    currentRequestState = digitalRead(PIN_REQUEST_1);
 
     if (lastRequestState == HIGH && currentRequestState == LOW) {
       TrafficLight_EventId request = TrafficLight_EventId_REQUESTGREEN;
