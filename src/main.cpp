@@ -140,6 +140,11 @@ void taskSerial(void* pvParameters){
                       "3. Auslesen der aktuellen Dauer der Grünphase\n"
                       "4. Auslesen der aktuellen Helligkeit\n\n"
                       "Auswahl: ";
+  
+  const char* tlChoose = "Bitte Ampel per Nummer wählen:\n"
+                      "1. Ampel 1\n"
+                      "2. Ampel 2\n\n"
+                      "Auswahl: ";
 
   Serial.print(menu);
 
@@ -164,8 +169,24 @@ void taskSerial(void* pvParameters){
         }
         else if (input == '2'){
           TrafficLight_EventId request = TrafficLight_EventId_REQUESTGREEN;
-          xQueueSend(q1, &request, 0);
-          Serial.print("Request wurde gesetzt.");
+
+          Serial.print(tlChoose);
+
+          input = Serial.read();
+          if (input == '\n' || input == '\r' || input == ' ') continue;
+          if (input == '1' || input == '2'){
+            Serial.print(input);
+            Serial.println();
+
+            if (input == '1'){
+              xQueueSend(q1, &request, 0);
+              Serial.print("Request für Ampel 1 wurde gesetzt.");
+            }
+            else if (input == '2'){
+              xQueueSend(q2, &request, 0);
+              Serial.print("Request für Ampel 2 wurde gesetzt.");
+            }
+          }
         }
         else if (input == '3'){
           int greenTime = tl1.vars.greenTime / 1000;
