@@ -8,7 +8,7 @@
 #define PIN_POTI 13
 
 
-TrafficLight tl;
+TrafficLight tl1;
 
 QueueHandle_t q;
 TaskHandle_t hTrafficLight;
@@ -21,19 +21,19 @@ TaskHandle_t hSensors;
 void taskTrafficLight(void* pvParemeters){
   TrafficLight_EventId event;
 
-  TrafficLight_ctor(&tl);
+  TrafficLight_ctor(&tl1);
 
   // Startwerte setzen
-  tl.vars.time = 0;
-  tl.vars.greenTime = 5000; // 5 Sekunden
-  tl.vars.brightness = 4095; // Start als "hell"
-  tl.vars.threshold = 2000;
+  tl1.vars.time = 0;
+  tl1.vars.greenTime = 5000; // 5 Sekunden
+  tl1.vars.brightness = 4095; // Start als "hell"
+  tl1.vars.threshold = 2000;
 
-  TrafficLight_start(&tl);
+  TrafficLight_start(&tl1);
   
   while (1){
     if (xQueueReceive(q, &event, portMAX_DELAY) == pdPASS){
-      TrafficLight_dispatch_event(&tl, event);
+      TrafficLight_dispatch_event(&tl1, event);
     }
   }
 }
@@ -87,7 +87,7 @@ void taskSerial(void* pvParameters){
         Serial.println();
 
         if (input == '1'){
-          const char* currentState = TrafficLight_state_id_to_string(tl.state_id);
+          const char* currentState = TrafficLight_state_id_to_string(tl1.state_id);
           Serial.print("Der aktuelle Zustand der Ampel ist: ");
           Serial.print(currentState);
         }
@@ -121,20 +121,20 @@ void taskSensors(void* pvParameters){
     // Brightness aktualisieren
     int ldrValue = analogRead(PIN_LDR);
     int brightness = map(ldrValue, 0, 4095, 4095, 0);
-    tl.vars.brightness = brightness;
+    tl1.vars.brightness = brightness;
 
     // Grünphasenzeit aktualisieren
     int potiValue = analogRead(PIN_POTI);
     int greenTime = map(potiValue, 0, 4095, 1000, 10000); // 1 - 10 Sekunden
-    tl.vars.greenTime = greenTime;
+    tl1.vars.greenTime = greenTime;
 
     // Vorübergehend: Ausgabe der Werte
     Serial.print("LDR (Helligkeit): ");
-    Serial.print(tl.vars.brightness);
+    Serial.print(tl1.vars.brightness);
     Serial.print(" | Poti (Raw): ");
     Serial.print(potiValue);
     Serial.print(" -> GreenTime: ");
-    Serial.println(tl.vars.greenTime);
+    Serial.println(tl1.vars.greenTime);
 
     vTaskDelay(pdMS_TO_TICKS(200));
   }
