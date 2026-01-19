@@ -190,7 +190,8 @@ void setup() {
   q = xQueueCreate(20, sizeof(TrafficLight_EventId));
 
   xTaskCreate(taskClock, "Clock Task", 1024, NULL, 3, &hClock);
-  xTaskCreate(taskTrafficLight, "TrafficLight Task", 2048, NULL, 2, &hTrafficLight);
+  xTaskCreate(taskTrafficLight1, "TrafficLight1 Task", 2048, NULL, 2, &hTrafficLight1);
+  xTaskCreate(taskTrafficLight2, "TrafficLight2 Task", 2048, NULL, 2, &hTrafficLight2);
 
   xTaskCreate(taskRequest, "Request Task", 2048, NULL, 1, &hRequest);
   xTaskCreate(taskSerial, "Serial Task", 4096, NULL, 1, &hSerial);
