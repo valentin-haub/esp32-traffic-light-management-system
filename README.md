@@ -1,94 +1,75 @@
-# Traffic Management System (ESP32 / FreeRTOS)
+# Traffic Management System (Dual ESP32 / FreeRTOS)
 
-This project implements a real-time traffic light control system on an **ESP32** using **FreeRTOS** and a state machine generated with **StateSmith**.
+This project implements a real-time traffic light control system for **two independent intersections** on a single **ESP32** using **FreeRTOS** and state machines generated with **StateSmith**.
 
-The application utilizes a clean **Producer-Consumer architecture**, separating business logic, timing, and user input into dedicated tasks communicating via thread-safe queues.
+It features a clean **Producer-Consumer architecture**, separating business logic, timing, and user input into dedicated tasks communicating via thread-safe queues. Additionally, it visualizes the configurable green-phase duration using a **4-bit binary LED display**.
 
 *Developed as part of the **Technische Informatik 2** module.*
 
+## Features
+
+- **Dual Traffic Light Control:** Two independent state machines running in parallel.
+- **Binary Display:** 4 LEDs display the current green-phase duration (1-10s) in binary format (0-15).
+- **Night Mode:** Automatic blinking yellow mode based on LDR brightness sensor.
+- **Configurable Timing:** Potentiometer adjusts the green phase duration in real-time.
+- **Interactive Serial Menu:** Monitoring and control via UART.
+
 ## Hardware Setup
 
-The project is configured for a standard **ESP32 Development Board** (e.g., ESP32-WROOM / NodeMCU).
+The project is configured for a standard **ESP32 Development Board**.
 
 ### Pin Configuration (Wiring)
 
-| Component | GPIO Pin | Mode | Note |
-| :--- | :--- | :--- | :--- |
-| **LED Red** | `5` | Output | Internal LED on some boards, or external |
-| **LED Yellow** | `4` | Output | Cathode to GND, use resistor |
-| **LED Green** | `2` | Output | Cathode to GND, use resistor |
-| **Button** | `15` | Input Pullup | Connects to **GND** when pressed |
-| **LDR (Light Sensor)** | `12` | Input | Voltage divider (10kΩ resistor) |
-| **Potentiometer** | `13` | Input | Center pin to GPIO 35 |
-
-> **Note:** The button is configured as `INPUT_PULLUP`. It triggers the signal when pulled to ground (active low).
+| Component | GPIO Pin | Note |
+| :--- | :--- | :--- |
+| **Traffic Light 1** | **Red:** `23`, **Yellow:** `22`, **Green:** `21` | |
+| **Traffic Light 2** | **Red:** `16`, **Yellow:** `4`, **Green:** `2` | |
+| **Button 1** (Request TL1) | `19` | Active Low (Input Pullup) |
+| **Button 2** (Request TL2) | `15` | Active Low (Input Pullup) |
+| **Binary Display (LSB)** | `32` | Bit 0 (Value 1) |
+| **Binary Display** | `33` | Bit 1 (Value 2) |
+| **Binary Display** | `25` | Bit 2 (Value 4) |
+| **Binary Display (MSB)** | `26` | Bit 3 (Value 8) |
+| **LDR (Light Sensor)** | `12` | Analog Input |
+| **Potentiometer** | `13` | Analog Input |
 
 ## Simulation (Wokwi)
 
-This project includes a fully configured **Wokwi Simulation**. You can run and test the complete code virtually without physical hardware.
+This project includes a fully configured **Wokwi Simulation**.
 
-**How to run the simulation:**
+**How to run:**
 1. Install the **Wokwi Simulator** extension in VS Code.
-2. **Verify Pin Configuration:** Ensure that the pins defined in `src/main.cpp` match the wiring in `simulation/diagram.json`.
-3. **Build Project:** Click the **Build** icon (`✔`) in the PlatformIO toolbar to compile the latest code. Wokwi uses the generated `firmware.bin`, so you must rebuild after every code change.
-4. Open the file `simulation/diagram.json`.
-5. Press `F1` and run the command **"Wokwi: Start Simulator"**.
-
-The simulation uses the compiled firmware directly from the `.pio` folder.
+2. **Build Project:** Click the **Build** icon (`✔`) in PlatformIO.
+3. Open `simulation/diagram.json`.
+4. Press `F1` and run **"Wokwi: Start Simulator"**.
 
 ![Wokwi Setup](doc/Wokwi_multi_binaryDisplay.png)
 
 ## Software Architecture
 
-The system is built on **FreeRTOS** to handle multitasking efficiently.
+The system uses **FreeRTOS** to handle multitasking. To ensure separation of concerns, each traffic light has its own dedicated Task and Queue.
 
 ### Tasks & Priorities
 
-1. **Clock Task (Prio 3):** High-priority generator that sends a `TICK` event every 1ms to the queue to ensure accurate timing.
-
-2. **TrafficLight Task (Prio 2):** The consumer task hosting the StateSmith logic. It processes events (`TICK`, `REQUESTGREEN`) from the queue.
-
-3. **Sensors Task (Prio 1):** Reads analog values from the LDR (brightness) and Potentiometer (green phase duration) periodically.
-
-4. **Request Task (Prio 1):** Monitors the physical button (Pin 13) with debouncing logic and produces `REQUESTGREEN` events.
-
-5. **Serial Task (Prio 1):** Handles user interaction via UART (Serial Monitor), robust against whitespace/newline errors.
+1. **Clock Task (Prio 3):** Generates `TICK` events every 1ms and distributes them to *both* queues (`q1`, `q2`).
+2. **TrafficLight Tasks 1 & 2 (Prio 2):** Two separate consumer tasks hosting the StateSmith logic. They process events from their respective queues.
+3. **Sensors Task (Prio 1):** Reads analog sensors (LDR, Poti), updates shared variables, and drives the **Binary Display** via the driver layer.
+4. **Request Tasks 1 & 2 (Prio 1):** Monitor the physical buttons with debouncing logic and send `REQUESTGREEN` events to the specific queue.
+5. **Serial Task (Prio 1):** Handles user interaction via UART.
 
 ### State Machine
 
-The main logic is generated using **StateSmith** (`TrafficLight.hpp`/`.cpp`). It implements a standard traffic light cycle:
-- `TRAFFICLIGHTGREEN`
-- `TRAFFICLIGHTYELLOW`
-- `TRAFFICLIGHTRED`
-- `TRAFFICLIGHTREDYELLOW`
-- `NIGHTMODE` (Blinking Yellow when dark)
+The logic is generated using **StateSmith** (`TrafficLight.hpp`/`.cpp`). Both traffic light instances (`tl1`, `tl2`) share the same logic structure but operate on different data sets.
 
-## Installation & Usage
+## Usage / Serial Menu
 
-1. **Open Project:** Open this folder in VS Code with the **PlatformIO** extension installed.
+Connect via Serial Monitor at **115200 baud**.
 
-2. **Build:** Run the "Build" task to compile the firmware.
-
-3. **Upload (Hardware):** Connect your ESP32 and use the PlatformIO "Upload" button.
-
-4. **Monitor:** Open the Serial Monitor at **115200 baud**.
-
-### Serial Control
-
-You can interact with the system via the Serial Monitor:
-
-- Type `1`: Prints the current state of the traffic light.
-- Type `2`: Simulates a pedestrian button press (`REQUESTGREEN`).
-
-## Tech Stack
-
-- **Hardware:** ESP32 (Espressif Systems)
-- **Framework:** Arduino (via PlatformIO)
-- **OS:** FreeRTOS (Tasks, Queues)
-- **Modeling:** StateSmith (State machine)
-- **Simulation:** Wokwi
-- **Language:** C++
+- **1:** Print current states (Shows "NIGHTMODE" if active).
+- **2:** Simulate pedestrian button press for TL 1 or 2.
+- **3:** Show current green phase duration (in seconds, e.g., "4.32 Sek").
+- **4:** Show current brightness sensor value.
 
 ---
 
-**Version:** 3.0
+**Version:** 4.0 (Dual-Instance + Binary Update)
