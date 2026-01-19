@@ -187,11 +187,13 @@ void taskSensors(void* pvParameters){
     int ldrValue = analogRead(PIN_LDR);
     int brightness = map(ldrValue, 0, 4095, 4095, 0);
     tl1.vars.brightness = brightness;
+    tl2.vars.brightness = brightness;
 
     // Grünphasenzeit aktualisieren
     int potiValue = analogRead(PIN_POTI);
     int greenTime = map(potiValue, 0, 4095, 1000, 10000); // 1 - 10 Sekunden
     tl1.vars.greenTime = greenTime;
+    tl2.vars.greenTime = greenTime;
 
     // Vorübergehend: Ausgabe der Werte
     Serial.print("LDR (Helligkeit): ");
