@@ -167,6 +167,14 @@ void taskSerial(void* pvParameters){
         if (input == '1'){
           const char* currentState1 = TrafficLight_state_id_to_string(tl1.state_id);
           const char* currentState2 = TrafficLight_state_id_to_string(tl2.state_id);
+
+          if (tl1.state_id == TrafficLight_StateId_BLINKON || tl1.state_id == TrafficLight_StateId_BLINKOFF){
+            currentState1 = "NIGHTMODE";
+          }
+          if (tl2.state_id == TrafficLight_StateId_BLINKON || tl1.state_id == TrafficLight_StateId_BLINKOFF){
+            currentState2 = "NIGHTMODE";
+          }
+
           Serial.print("Der aktuelle Zustand der Ampel ist: ");
           Serial.print(currentState1);
           Serial.print("\r\n");
