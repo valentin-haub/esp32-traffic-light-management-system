@@ -43,6 +43,10 @@ typedef struct TrafficLight TrafficLight;
 // State machine variables. Can be used for inputs, outputs, user variables...
 typedef struct TrafficLight_Vars
 {
+    uint8_t pinRed;
+    uint8_t pinYellow;
+    uint8_t pinGreen;
+    
     uint16_t time;
     uint16_t greenTime;
     uint16_t brightness;

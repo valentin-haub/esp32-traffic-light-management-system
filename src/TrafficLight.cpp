@@ -78,12 +78,12 @@ void TrafficLight_start(TrafficLight* sm)
         // ROOT.<InitialState> is a pseudo state and cannot have an `enter` trigger.
         
         // ROOT.<InitialState> behavior
-        // uml: / { initRedLight(); initYellowLight(); initGreenLight(); } TransitionTo(TrafficLightRed)
+        // uml: / { initLight(pinRed); initLight(pinYellow); initLight(pinGreen); } TransitionTo(TrafficLightRed)
         {
             // Step 1: Exit states until we reach `ROOT` state (Least Common Ancestor for transition). Already at LCA, no exiting required.
             
-            // Step 2: Transition action: `initRedLight(); initYellowLight(); initGreenLight();`.
-            initRedLight(); initYellowLight(); initGreenLight();
+            // Step 2: Transition action: `initLight(pinRed); initLight(pinYellow); initLight(pinGreen);`.
+            initLight(sm->vars.pinRed); initLight(sm->vars.pinYellow); initLight(sm->vars.pinGreen);
             
             // Step 3: Enter/move towards transition target `TrafficLightRed`.
             TRAFFICLIGHTRED_enter(sm);
@@ -375,20 +375,20 @@ static void TRAFFICLIGHTGREEN_enter(TrafficLight* sm)
     sm->state_id = TrafficLight_StateId_TRAFFICLIGHTGREEN;
     
     // TrafficLightGreen behavior
-    // uml: enter / { turnOnGreenLight(); time = 0; }
+    // uml: enter / { turnOnLight(pinGreen); time = 0; }
     {
-        // Step 1: execute action `turnOnGreenLight(); time = 0;`
-        turnOnGreenLight(); sm->vars.time = 0;
+        // Step 1: execute action `turnOnLight(pinGreen); time = 0;`
+        turnOnLight(sm->vars.pinGreen); sm->vars.time = 0;
     } // end of behavior for TrafficLightGreen
 }
 
 static void TRAFFICLIGHTGREEN_exit(TrafficLight* sm)
 {
     // TrafficLightGreen behavior
-    // uml: exit / { turnOffGreenLight(); }
+    // uml: exit / { turnOffLight(pinGreen); }
     {
-        // Step 1: execute action `turnOffGreenLight();`
-        turnOffGreenLight();
+        // Step 1: execute action `turnOffLight(pinGreen);`
+        turnOffLight(sm->vars.pinGreen);
     } // end of behavior for TrafficLightGreen
     
     sm->state_id = TrafficLight_StateId_ROOT;
@@ -432,20 +432,20 @@ static void TRAFFICLIGHTRED_enter(TrafficLight* sm)
     sm->state_id = TrafficLight_StateId_TRAFFICLIGHTRED;
     
     // TrafficLightRed behavior
-    // uml: enter / { turnOnRedLight(); time = 0; }
+    // uml: enter / { turnOnLight(pinRed); time = 0; }
     {
-        // Step 1: execute action `turnOnRedLight(); time = 0;`
-        turnOnRedLight(); sm->vars.time = 0;
+        // Step 1: execute action `turnOnLight(pinRed); time = 0;`
+        turnOnLight(sm->vars.pinRed); sm->vars.time = 0;
     } // end of behavior for TrafficLightRed
 }
 
 static void TRAFFICLIGHTRED_exit(TrafficLight* sm)
 {
     // TrafficLightRed behavior
-    // uml: exit / { turnOffRedLight(); }
+    // uml: exit / { turnOffLight(pinRed); }
     {
-        // Step 1: execute action `turnOffRedLight();`
-        turnOffRedLight();
+        // Step 1: execute action `turnOffLight(pinRed);`
+        turnOffLight(sm->vars.pinRed);
     } // end of behavior for TrafficLightRed
     
     sm->state_id = TrafficLight_StateId_ROOT;
@@ -520,20 +520,20 @@ static void TRAFFICLIGHTREDYELLOW_enter(TrafficLight* sm)
     sm->state_id = TrafficLight_StateId_TRAFFICLIGHTREDYELLOW;
     
     // TrafficLightRedYellow behavior
-    // uml: enter / { turnOnRedLight(); turnOnYellowLight(); time = 0; }
+    // uml: enter / { turnOnLight(pinRed); turnOnLight(pinYellow); time = 0; }
     {
-        // Step 1: execute action `turnOnRedLight(); turnOnYellowLight(); time = 0;`
-        turnOnRedLight(); turnOnYellowLight(); sm->vars.time = 0;
+        // Step 1: execute action `turnOnLight(pinRed); turnOnLight(pinYellow); time = 0;`
+        turnOnLight(sm->vars.pinRed); turnOnLight(sm->vars.pinYellow); sm->vars.time = 0;
     } // end of behavior for TrafficLightRedYellow
 }
 
 static void TRAFFICLIGHTREDYELLOW_exit(TrafficLight* sm)
 {
     // TrafficLightRedYellow behavior
-    // uml: exit / { turnOffRedLight(); turnOffYellowLight(); }
+    // uml: exit / { turnOffLight(pinRed); turnOffLight(pinYellow); }
     {
-        // Step 1: execute action `turnOffRedLight(); turnOffYellowLight();`
-        turnOffRedLight(); turnOffYellowLight();
+        // Step 1: execute action `turnOffLight(pinRed); turnOffLight(pinYellow);`
+        turnOffLight(sm->vars.pinRed); turnOffLight(sm->vars.pinYellow);
     } // end of behavior for TrafficLightRedYellow
     
     sm->state_id = TrafficLight_StateId_ROOT;
@@ -577,20 +577,20 @@ static void TRAFFICLIGHTYELLOW_enter(TrafficLight* sm)
     sm->state_id = TrafficLight_StateId_TRAFFICLIGHTYELLOW;
     
     // TrafficLightYellow behavior
-    // uml: enter / { turnOnYellowLight(); time = 0; }
+    // uml: enter / { turnOnLight(pinYellow); time = 0; }
     {
-        // Step 1: execute action `turnOnYellowLight(); time = 0;`
-        turnOnYellowLight(); sm->vars.time = 0;
+        // Step 1: execute action `turnOnLight(pinYellow); time = 0;`
+        turnOnLight(sm->vars.pinYellow); sm->vars.time = 0;
     } // end of behavior for TrafficLightYellow
 }
 
 static void TRAFFICLIGHTYELLOW_exit(TrafficLight* sm)
 {
     // TrafficLightYellow behavior
-    // uml: exit / { turnOffYellowLight(); }
+    // uml: exit / { turnOffLight(pinYellow); }
     {
-        // Step 1: execute action `turnOffYellowLight();`
-        turnOffYellowLight();
+        // Step 1: execute action `turnOffLight(pinYellow);`
+        turnOffLight(sm->vars.pinYellow);
     } // end of behavior for TrafficLightYellow
     
     sm->state_id = TrafficLight_StateId_ROOT;

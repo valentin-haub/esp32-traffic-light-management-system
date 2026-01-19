@@ -253,9 +253,9 @@ TrafficLightRed
 
 TrafficLightRed : TrafficLightRed
 
-TrafficLightRed : enter / #123; turnOnRedLight()#59; time = 0#59; #125;
+TrafficLightRed : enter / #123; turnOnLight(pinRed)#59; time = 0#59; #125;
 
-TrafficLightRed : exit / #123; turnOffRedLight()#59; #125;
+TrafficLightRed : exit / #123; turnOffLight(pinRed)#59; #125;
 
 TrafficLightRed : tick / #123; time++#59; #125;
 
@@ -263,9 +263,9 @@ TrafficLightRedYellow
 
 TrafficLightRedYellow : TrafficLightRedYellow
 
-TrafficLightRedYellow : enter / #123; turnOnRedLight()#59; turnOnYellowLight()#59; time = 0#59; #125;
+TrafficLightRedYellow : enter / #123; turnOnLight(pinRed)#59; turnOnLight(pinYellow)#59; time = 0#59; #125;
 
-TrafficLightRedYellow : exit / #123; turnOffRedLight()#59; turnOffYellowLight()#59; #125;
+TrafficLightRedYellow : exit / #123; turnOffLight(pinRed)#59; turnOffLight(pinYellow)#59; #125;
 
 TrafficLightRedYellow : tick / #123; time++#59; #125;
 
@@ -273,9 +273,9 @@ TrafficLightGreen
 
 TrafficLightGreen : TrafficLightGreen
 
-TrafficLightGreen : enter / #123; turnOnGreenLight()#59; time = 0#59; #125;
+TrafficLightGreen : enter / #123; turnOnLight(pinGreen)#59; time = 0#59; #125;
 
-TrafficLightGreen : exit / #123; turnOffGreenLight()#59; #125;
+TrafficLightGreen : exit / #123; turnOffLight(pinGreen)#59; #125;
 
 TrafficLightGreen : tick / #123; time++#59; #125;
 
@@ -283,9 +283,9 @@ TrafficLightYellow
 
 TrafficLightYellow : TrafficLightYellow
 
-TrafficLightYellow : enter / #123; turnOnYellowLight()#59; time = 0#59; #125;
+TrafficLightYellow : enter / #123; turnOnLight(pinYellow)#59; time = 0#59; #125;
 
-TrafficLightYellow : exit / #123; turnOffYellowLight()#59; #125;
+TrafficLightYellow : exit / #123; turnOffLight(pinYellow)#59; #125;
 
 TrafficLightYellow : tick / #123; time++#59; #125;
 
@@ -339,7 +339,7 @@ BlinkOff --> TrafficLightRed : tick [brightness > threshold + 100]
 
 NightMode.(InitialState) --> BlinkOff
 
-ROOT.(InitialState) --> TrafficLightRed : / #123; initRedLight()#59; initYellowLight()#59; initGreenLight()#59; #125;
+ROOT.(InitialState) --> TrafficLightRed : / #123; initLight(pinRed)#59; initLight(pinYellow)#59; initLight(pinGreen)#59; #125;
 
 
 
@@ -432,12 +432,12 @@ evaluateGuard = null;
             // ROOT.<InitialState> is a pseudo state and cannot have an `enter` trigger.
             
             // ROOT.<InitialState> behavior
-            // uml: / { this.tracer?.log("⚡ FSM would execute action: " + "initRedLight(); initYellowLight(); initGreenLight();");this.tracer?.edgeTransition("edge10"); } TransitionTo(TrafficLightRed)
+            // uml: / { this.tracer?.log("⚡ FSM would execute action: " + "initLight(pinRed); initLight(pinYellow); initLight(pinGreen);");this.tracer?.edgeTransition("edge10"); } TransitionTo(TrafficLightRed)
             {
                 // Step 1: Exit states until we reach `ROOT` state (Least Common Ancestor for transition). Already at LCA, no exiting required.
                 
-                // Step 2: Transition action: `this.tracer?.log("⚡ FSM would execute action: " + "initRedLight(); initYellowLight(); initGreenLight();");this.tracer?.edgeTransition("edge10");`.
-                this.tracer?.log("⚡ FSM would execute action: " + "initRedLight(); initYellowLight(); initGreenLight();");this.tracer?.edgeTransition("edge10");
+                // Step 2: Transition action: `this.tracer?.log("⚡ FSM would execute action: " + "initLight(pinRed); initLight(pinYellow); initLight(pinGreen);");this.tracer?.edgeTransition("edge10");`.
+                this.tracer?.log("⚡ FSM would execute action: " + "initLight(pinRed); initLight(pinYellow); initLight(pinGreen);");this.tracer?.edgeTransition("edge10");
                 
                 // Step 3: Enter/move towards transition target `TrafficLightRed`.
                 this.#TRAFFICLIGHTRED_enter();
@@ -770,20 +770,20 @@ evaluateGuard = null;
         } // end of behavior for TrafficLightGreen
         
         // TrafficLightGreen behavior
-        // uml: enter / { this.tracer?.log("⚡ FSM would execute action: " + "turnOnGreenLight(); time = 0;"); }
+        // uml: enter / { this.tracer?.log("⚡ FSM would execute action: " + "turnOnLight(pinGreen); time = 0;"); }
         {
-            // Step 1: execute action `this.tracer?.log("⚡ FSM would execute action: " + "turnOnGreenLight(); time = 0;");`
-            this.tracer?.log("⚡ FSM would execute action: " + "turnOnGreenLight(); time = 0;");
+            // Step 1: execute action `this.tracer?.log("⚡ FSM would execute action: " + "turnOnLight(pinGreen); time = 0;");`
+            this.tracer?.log("⚡ FSM would execute action: " + "turnOnLight(pinGreen); time = 0;");
         } // end of behavior for TrafficLightGreen
     }
     
     #TRAFFICLIGHTGREEN_exit()
     {
         // TrafficLightGreen behavior
-        // uml: exit / { this.tracer?.log("⚡ FSM would execute action: " + "turnOffGreenLight();"); }
+        // uml: exit / { this.tracer?.log("⚡ FSM would execute action: " + "turnOffLight(pinGreen);"); }
         {
-            // Step 1: execute action `this.tracer?.log("⚡ FSM would execute action: " + "turnOffGreenLight();");`
-            this.tracer?.log("⚡ FSM would execute action: " + "turnOffGreenLight();");
+            // Step 1: execute action `this.tracer?.log("⚡ FSM would execute action: " + "turnOffLight(pinGreen);");`
+            this.tracer?.log("⚡ FSM would execute action: " + "turnOffLight(pinGreen);");
         } // end of behavior for TrafficLightGreen
         
         // TrafficLightGreen behavior
@@ -842,20 +842,20 @@ evaluateGuard = null;
         } // end of behavior for TrafficLightRed
         
         // TrafficLightRed behavior
-        // uml: enter / { this.tracer?.log("⚡ FSM would execute action: " + "turnOnRedLight(); time = 0;"); }
+        // uml: enter / { this.tracer?.log("⚡ FSM would execute action: " + "turnOnLight(pinRed); time = 0;"); }
         {
-            // Step 1: execute action `this.tracer?.log("⚡ FSM would execute action: " + "turnOnRedLight(); time = 0;");`
-            this.tracer?.log("⚡ FSM would execute action: " + "turnOnRedLight(); time = 0;");
+            // Step 1: execute action `this.tracer?.log("⚡ FSM would execute action: " + "turnOnLight(pinRed); time = 0;");`
+            this.tracer?.log("⚡ FSM would execute action: " + "turnOnLight(pinRed); time = 0;");
         } // end of behavior for TrafficLightRed
     }
     
     #TRAFFICLIGHTRED_exit()
     {
         // TrafficLightRed behavior
-        // uml: exit / { this.tracer?.log("⚡ FSM would execute action: " + "turnOffRedLight();"); }
+        // uml: exit / { this.tracer?.log("⚡ FSM would execute action: " + "turnOffLight(pinRed);"); }
         {
-            // Step 1: execute action `this.tracer?.log("⚡ FSM would execute action: " + "turnOffRedLight();");`
-            this.tracer?.log("⚡ FSM would execute action: " + "turnOffRedLight();");
+            // Step 1: execute action `this.tracer?.log("⚡ FSM would execute action: " + "turnOffLight(pinRed);");`
+            this.tracer?.log("⚡ FSM would execute action: " + "turnOffLight(pinRed);");
         } // end of behavior for TrafficLightRed
         
         // TrafficLightRed behavior
@@ -947,20 +947,20 @@ evaluateGuard = null;
         } // end of behavior for TrafficLightRedYellow
         
         // TrafficLightRedYellow behavior
-        // uml: enter / { this.tracer?.log("⚡ FSM would execute action: " + "turnOnRedLight(); turnOnYellowLight(); time = 0;"); }
+        // uml: enter / { this.tracer?.log("⚡ FSM would execute action: " + "turnOnLight(pinRed); turnOnLight(pinYellow); time = 0;"); }
         {
-            // Step 1: execute action `this.tracer?.log("⚡ FSM would execute action: " + "turnOnRedLight(); turnOnYellowLight(); time = 0;");`
-            this.tracer?.log("⚡ FSM would execute action: " + "turnOnRedLight(); turnOnYellowLight(); time = 0;");
+            // Step 1: execute action `this.tracer?.log("⚡ FSM would execute action: " + "turnOnLight(pinRed); turnOnLight(pinYellow); time = 0;");`
+            this.tracer?.log("⚡ FSM would execute action: " + "turnOnLight(pinRed); turnOnLight(pinYellow); time = 0;");
         } // end of behavior for TrafficLightRedYellow
     }
     
     #TRAFFICLIGHTREDYELLOW_exit()
     {
         // TrafficLightRedYellow behavior
-        // uml: exit / { this.tracer?.log("⚡ FSM would execute action: " + "turnOffRedLight(); turnOffYellowLight();"); }
+        // uml: exit / { this.tracer?.log("⚡ FSM would execute action: " + "turnOffLight(pinRed); turnOffLight(pinYellow);"); }
         {
-            // Step 1: execute action `this.tracer?.log("⚡ FSM would execute action: " + "turnOffRedLight(); turnOffYellowLight();");`
-            this.tracer?.log("⚡ FSM would execute action: " + "turnOffRedLight(); turnOffYellowLight();");
+            // Step 1: execute action `this.tracer?.log("⚡ FSM would execute action: " + "turnOffLight(pinRed); turnOffLight(pinYellow);");`
+            this.tracer?.log("⚡ FSM would execute action: " + "turnOffLight(pinRed); turnOffLight(pinYellow);");
         } // end of behavior for TrafficLightRedYellow
         
         // TrafficLightRedYellow behavior
@@ -1019,20 +1019,20 @@ evaluateGuard = null;
         } // end of behavior for TrafficLightYellow
         
         // TrafficLightYellow behavior
-        // uml: enter / { this.tracer?.log("⚡ FSM would execute action: " + "turnOnYellowLight(); time = 0;"); }
+        // uml: enter / { this.tracer?.log("⚡ FSM would execute action: " + "turnOnLight(pinYellow); time = 0;"); }
         {
-            // Step 1: execute action `this.tracer?.log("⚡ FSM would execute action: " + "turnOnYellowLight(); time = 0;");`
-            this.tracer?.log("⚡ FSM would execute action: " + "turnOnYellowLight(); time = 0;");
+            // Step 1: execute action `this.tracer?.log("⚡ FSM would execute action: " + "turnOnLight(pinYellow); time = 0;");`
+            this.tracer?.log("⚡ FSM would execute action: " + "turnOnLight(pinYellow); time = 0;");
         } // end of behavior for TrafficLightYellow
     }
     
     #TRAFFICLIGHTYELLOW_exit()
     {
         // TrafficLightYellow behavior
-        // uml: exit / { this.tracer?.log("⚡ FSM would execute action: " + "turnOffYellowLight();"); }
+        // uml: exit / { this.tracer?.log("⚡ FSM would execute action: " + "turnOffLight(pinYellow);"); }
         {
-            // Step 1: execute action `this.tracer?.log("⚡ FSM would execute action: " + "turnOffYellowLight();");`
-            this.tracer?.log("⚡ FSM would execute action: " + "turnOffYellowLight();");
+            // Step 1: execute action `this.tracer?.log("⚡ FSM would execute action: " + "turnOffLight(pinYellow);");`
+            this.tracer?.log("⚡ FSM would execute action: " + "turnOffLight(pinYellow);");
         } // end of behavior for TrafficLightYellow
         
         // TrafficLightYellow behavior
