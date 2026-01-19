@@ -29,9 +29,10 @@ This project includes a fully configured **Wokwi Simulation**. You can run and t
 
 **How to run the simulation:**
 1. Install the **Wokwi Simulator** extension in VS Code.
-1. Open the file `simulation/diagram.json`.
 2. **Verify Pin Configuration:** Ensure that the pins defined in `src/main.cpp` match the wiring in `simulation/diagram.json`.
-3. Press `F1` and run the command **"Wokwi: Start Simulator"**.
+3. **Build Project:** Click the **Build** icon (`✔`) in the PlatformIO toolbar to compile the latest code. Wokwi uses the generated `firmware.bin`, so you must rebuild after every code change.
+4. Open the file `simulation/diagram.json`.
+5. Press `F1` and run the command **"Wokwi: Start Simulator"**.
 
 The simulation uses the compiled firmware directly from the `.pio` folder.
 
