@@ -33,30 +33,30 @@ state NightMode {
 ' ///////////////////////// STATE HANDLERS /////////////////////////
 ' Syntax: https://github.com/StateSmith/StateSmith/wiki/Behaviors
 
-[*] --> TrafficLightRed : / initRedLight(); initYellowLight(); initGreenLight();
+[*] --> TrafficLightRed : / initLight(pinRed); initLight(pinYellow); initLight(pinGreen);
 
 ' TrafficLightRed
-TrafficLightRed: enter / turnOnRedLight(); time = 0;
-TrafficLightRed: exit  / turnOffRedLight();
+TrafficLightRed: enter / turnOnLight(pinRed); time = 0;
+TrafficLightRed: exit  / turnOffLight(pinRed);
 TrafficLightRed: tick / time++;
 TrafficLightRed --> TrafficLightRedYellow : requestGreen
 TrafficLightRed --> NightMode : tick [brightness < threshold - 100]
 
 ' TrafficLightRedYellow
-TrafficLightRedYellow: enter / turnOnRedLight(); turnOnYellowLight(); time = 0;
-TrafficLightRedYellow: exit / turnOffRedLight(); turnOffYellowLight();
+TrafficLightRedYellow: enter / turnOnLight(pinRed); turnOnLight(pinYellow); time = 0;
+TrafficLightRedYellow: exit / turnOffLight(pinRed); turnOffLight(pinYellow);
 TrafficLightRedYellow: tick / time++;
 TrafficLightRedYellow --> TrafficLightGreen : tick [time > 2000]
 
 ' TrafficLightGreen
-TrafficLightGreen: enter / turnOnGreenLight(); time = 0;
-TrafficLightGreen: exit  / turnOffGreenLight();
+TrafficLightGreen: enter / turnOnLight(pinGreen); time = 0;
+TrafficLightGreen: exit  / turnOffLight(pinGreen);
 TrafficLightGreen: tick / time++;
 TrafficLightGreen --> TrafficLightYellow : tick [time > greenTime]
 
 ' TrafficLightYellow
-TrafficLightYellow: enter / turnOnYellowLight(); time = 0;
-TrafficLightYellow: exit  / turnOffYellowLight();
+TrafficLightYellow: enter / turnOnLight(pinYellow); time = 0;
+TrafficLightYellow: exit  / turnOffLight(pinYellow);
 TrafficLightYellow: tick / time++;
 TrafficLightYellow --> TrafficLightRed : tick [time > 3000]
 
@@ -72,6 +72,10 @@ TrafficLightYellow --> TrafficLightRed : tick [time > 3000]
 FileTop = """
     """
 AutoExpandedVars = """
+    uint8_t pinRed;
+    uint8_t pinYellow;
+    uint8_t pinGreen;
+
     uint16_t time;
     uint16_t greenTime;
     uint16_t brightness;
