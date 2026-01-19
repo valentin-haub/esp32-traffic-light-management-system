@@ -295,9 +295,9 @@ state NightMode {
 
         BlinkOn : BlinkOn
 
-        BlinkOn : enter / #123; turnOnYellowLight()#59; time = 0#59; #125;
+        BlinkOn : enter / #123; turnOnLight(pinYellow)#59; time = 0#59; #125;
 
-        BlinkOn : exit / #123; turnOffYellowLight()#59; #125;
+        BlinkOn : exit / #123; turnOffLight(pinYellow)#59; #125;
 
         BlinkOn : tick / #123; time++#59; #125;
 
@@ -681,20 +681,20 @@ evaluateGuard = null;
         } // end of behavior for BlinkOn
         
         // BlinkOn behavior
-        // uml: enter / { this.tracer?.log("⚡ FSM would execute action: " + "turnOnYellowLight(); time = 0;"); }
+        // uml: enter / { this.tracer?.log("⚡ FSM would execute action: " + "turnOnLight(pinYellow); time = 0;"); }
         {
-            // Step 1: execute action `this.tracer?.log("⚡ FSM would execute action: " + "turnOnYellowLight(); time = 0;");`
-            this.tracer?.log("⚡ FSM would execute action: " + "turnOnYellowLight(); time = 0;");
+            // Step 1: execute action `this.tracer?.log("⚡ FSM would execute action: " + "turnOnLight(pinYellow); time = 0;");`
+            this.tracer?.log("⚡ FSM would execute action: " + "turnOnLight(pinYellow); time = 0;");
         } // end of behavior for BlinkOn
     }
     
     #BLINKON_exit()
     {
         // BlinkOn behavior
-        // uml: exit / { this.tracer?.log("⚡ FSM would execute action: " + "turnOffYellowLight();"); }
+        // uml: exit / { this.tracer?.log("⚡ FSM would execute action: " + "turnOffLight(pinYellow);"); }
         {
-            // Step 1: execute action `this.tracer?.log("⚡ FSM would execute action: " + "turnOffYellowLight();");`
-            this.tracer?.log("⚡ FSM would execute action: " + "turnOffYellowLight();");
+            // Step 1: execute action `this.tracer?.log("⚡ FSM would execute action: " + "turnOffLight(pinYellow);");`
+            this.tracer?.log("⚡ FSM would execute action: " + "turnOffLight(pinYellow);");
         } // end of behavior for BlinkOn
         
         // BlinkOn behavior

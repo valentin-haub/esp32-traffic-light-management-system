@@ -302,20 +302,20 @@ static void BLINKON_enter(TrafficLight* sm)
     sm->state_id = TrafficLight_StateId_BLINKON;
     
     // BlinkOn behavior
-    // uml: enter / { turnOnYellowLight(); time = 0; }
+    // uml: enter / { turnOnLight(pinYellow); time = 0; }
     {
-        // Step 1: execute action `turnOnYellowLight(); time = 0;`
-        turnOnYellowLight(); sm->vars.time = 0;
+        // Step 1: execute action `turnOnLight(pinYellow); time = 0;`
+        turnOnLight(sm->vars.pinYellow); sm->vars.time = 0;
     } // end of behavior for BlinkOn
 }
 
 static void BLINKON_exit(TrafficLight* sm)
 {
     // BlinkOn behavior
-    // uml: exit / { turnOffYellowLight(); }
+    // uml: exit / { turnOffLight(pinYellow); }
     {
-        // Step 1: execute action `turnOffYellowLight();`
-        turnOffYellowLight();
+        // Step 1: execute action `turnOffLight(pinYellow);`
+        turnOffLight(sm->vars.pinYellow);
     } // end of behavior for BlinkOn
     
     sm->state_id = TrafficLight_StateId_NIGHTMODE;
