@@ -235,14 +235,7 @@ void taskSensors(void* pvParameters){
     int greenTime = map(potiValue, 0, 4095, 1000, 10000); // 1 - 10 Sekunden
     tl1.vars.greenTime = greenTime;
     tl2.vars.greenTime = greenTime;
-
-    // Vorübergehend: Ausgabe der Werte
-    Serial.print("LDR (Helligkeit): ");
-    Serial.print(tl1.vars.brightness);
-    Serial.print(" | Poti (Raw): ");
-    Serial.print(potiValue);
-    Serial.print(" -> GreenTime: ");
-    Serial.println(tl1.vars.greenTime);
+    
 
     vTaskDelay(pdMS_TO_TICKS(200));
   }
