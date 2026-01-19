@@ -26,7 +26,8 @@ QueueHandle_t q2;
 
 TaskHandle_t hTrafficLight1;
 TaskHandle_t hTrafficLight2;
-TaskHandle_t hRequest;
+TaskHandle_t hRequest1;
+TaskHandle_t hRequest2;
 TaskHandle_t hClock;
 TaskHandle_t hSerial;
 TaskHandle_t hSensors;
@@ -82,7 +83,7 @@ void taskTrafficLight2(void* pvParemeters){
   }
 }
 
-void taskRequest(void* pvParameters){
+void taskRequest1(void* pvParameters){
   int lastRequestState = HIGH;
   int currentRequestState;
 
@@ -94,6 +95,25 @@ void taskRequest(void* pvParameters){
     if (lastRequestState == HIGH && currentRequestState == LOW) {
       TrafficLight_EventId request = TrafficLight_EventId_REQUESTGREEN;
       xQueueSend(q1, &request, 0);
+    }
+    lastRequestState = currentRequestState;
+
+    vTaskDelay(pdMS_TO_TICKS(20));
+  }
+}
+
+void taskRequest2(void* pvParameters){
+  int lastRequestState = HIGH;
+  int currentRequestState;
+
+  pinMode(PIN_REQUEST_2, INPUT_PULLUP);
+
+  while(1){
+    currentRequestState = digitalRead(PIN_REQUEST_2);
+
+    if (lastRequestState == HIGH && currentRequestState == LOW) {
+      TrafficLight_EventId request = TrafficLight_EventId_REQUESTGREEN;
+      xQueueSend(q2, &request, 0);
     }
     lastRequestState = currentRequestState;
 
@@ -197,7 +217,8 @@ void setup() {
   xTaskCreate(taskTrafficLight1, "TrafficLight1 Task", 2048, NULL, 2, &hTrafficLight1);
   xTaskCreate(taskTrafficLight2, "TrafficLight2 Task", 2048, NULL, 2, &hTrafficLight2);
 
-  xTaskCreate(taskRequest, "Request Task", 2048, NULL, 1, &hRequest);
+  xTaskCreate(taskRequest1, "Request1 Task", 2048, NULL, 1, &hRequest1);
+  xTaskCreate(taskRequest2, "Request2 Task", 2048, NULL, 1, &hRequest2);
   xTaskCreate(taskSerial, "Serial Task", 4096, NULL, 1, &hSerial);
   xTaskCreate(taskSensors, "Sensors Task", 1024, NULL, 1, &hSensors);
 }
