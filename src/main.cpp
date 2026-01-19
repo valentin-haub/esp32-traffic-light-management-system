@@ -3,16 +3,16 @@
 
 
 // PINs
-#define PIN_RED_1 5
-#define PIN_YELLOW_1 4
-#define PIN_GREEN_1 2
+#define PIN_RED_1 23
+#define PIN_YELLOW_1 22
+#define PIN_GREEN_1 21
 
-#define PIN_RED_2 25
-#define PIN_YELLOW_2 26
-#define PIN_GREEN_2 27
+#define PIN_RED_2 16
+#define PIN_YELLOW_2 4
+#define PIN_GREEN_2 2
 
-#define PIN_REQUEST_1 15
-#define PIN_REQUEST_2 14
+#define PIN_REQUEST_1 19
+#define PIN_REQUEST_2 15
 
 #define PIN_LDR 12
 #define PIN_POTI 13
