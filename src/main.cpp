@@ -136,7 +136,9 @@ void taskSerial(void* pvParameters){
   char input;
   const char* menu = "Wählen Sie einen Eintrag per Eingabe der Nummer:\n"
                       "1. Auslesen des Leuchzustands einer Ampel\n"
-                      "2. Setzen des Requests bei einer Ampel\n\n"
+                      "2. Setzen des Requests bei einer Ampel\n"
+                      "3. Auslesen der aktuellen Dauer der Grünphase\n"
+                      "4. Auslesen der aktuellen Helligkeit\n\n"
                       "Auswahl: ";
 
   Serial.print(menu);
@@ -147,7 +149,7 @@ void taskSerial(void* pvParameters){
 
       if (input == '\n' || input == '\r' || input == ' ') continue;
 
-      if (input == '1' || input == '2'){
+      if (input == '1' || input == '2' || input == '3' || input == '4'){
         Serial.print(input);
         Serial.println();
 
