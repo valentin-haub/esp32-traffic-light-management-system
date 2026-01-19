@@ -1,15 +1,8 @@
 #pragma once
 
 
-void initRedLight();
-void initYellowLight();
-void initGreenLight();
+void initLight(uint8_t pin);
 
-void turnOnRedLight();
-void turnOffRedLight();
+void turnOnLight(uint8_t pin);
 
-void turnOnYellowLight();
-void turnOffYellowLight();
-
-void turnOnGreenLight();
-void turnOffGreenLight();
+void turnOffLight(uint8_t pin);
