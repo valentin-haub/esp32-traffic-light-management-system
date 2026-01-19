@@ -1,5 +1,4 @@
 #include "driver.hpp"
-#include <Arduino.h>
 
 
 void initLight(uint8_t pin) {
