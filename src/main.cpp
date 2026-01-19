@@ -134,16 +134,16 @@ void taskClock(void* pvParameters){
 
 void taskSerial(void* pvParameters){
   char input;
-  const char* menu = "Wählen Sie einen Eintrag per Eingabe der Nummer:\n"
-                      "1. Auslesen des Leuchzustände der Ampeln\n"
-                      "2. Setzen des Requests bei einer Ampel\n"
-                      "3. Auslesen der aktuellen Dauer der Grünphase\n"
-                      "4. Auslesen der aktuellen Helligkeit\n\n"
+  const char* menu = "Wählen Sie einen Eintrag per Eingabe der Nummer:\r\n"
+                      "1. Auslesen des Leuchzustände der Ampeln\r\n"
+                      "2. Setzen des Requests bei einer Ampel\r\n"
+                      "3. Auslesen der aktuellen Dauer der Grünphase\r\n"
+                      "4. Auslesen der aktuellen Helligkeit\r\n\r\n"
                       "Auswahl: ";
   
-  const char* tlChoose = "Bitte Ampel per Nummer wählen:\n"
-                      "1. Ampel 1\n"
-                      "2. Ampel 2\n\n"
+  const char* tlChoose = "Bitte Ampel per Nummer wählen:\r\n"
+                      "1. Ampel 1\r\n"
+                      "2. Ampel 2\r\n\r\n"
                       "Auswahl: ";
 
   Serial.print(menu);
@@ -163,7 +163,7 @@ void taskSerial(void* pvParameters){
           const char* currentState2 = TrafficLight_state_id_to_string(tl2.state_id);
           Serial.print("Der aktuelle Zustand der Ampel ist: ");
           Serial.print(currentState1);
-          Serial.print("\n");
+          Serial.print("\r\n");
           Serial.print("Der aktuelle Zustand der Ampel ist: ");
           Serial.print(currentState2);
         }
@@ -209,7 +209,7 @@ void taskSerial(void* pvParameters){
       }
       else {
         Serial.println();
-        Serial.println("\nUngueltige Eingabe. Bitte '1', '2', '3' oder '4' eingeben.\n\n");
+        Serial.println("\r\nUngueltige Eingabe. Bitte '1', '2', '3' oder '4' eingeben.\r\n\r\n");
         Serial.print(menu);
       }
     }
@@ -235,7 +235,7 @@ void taskSensors(void* pvParameters){
     int greenTime = map(potiValue, 0, 4095, 1000, 10000); // 1 - 10 Sekunden
     tl1.vars.greenTime = greenTime;
     tl2.vars.greenTime = greenTime;
-    
+
 
     vTaskDelay(pdMS_TO_TICKS(200));
   }
