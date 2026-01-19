@@ -163,6 +163,17 @@ void taskSerial(void* pvParameters){
           xQueueSend(q1, &request, 0);
           Serial.print("Request wurde gesetzt.");
         }
+        else if (input == '3'){
+          int greenTime = tl1.vars.greenTime / 1000;
+          Serial.print("Die Dauer der Grünphasen beträgt: ");
+          Serial.print(greenTime);
+          Serial.print(" Sek.");
+        }
+        else if (input == '4'){
+          int brightness = tl1.vars.brightness;
+          Serial.print("Die aktuelle Helligkeit beträgt: ");
+          Serial.print(brightness);
+        }
 
         Serial.println();
         Serial.println();
@@ -170,7 +181,7 @@ void taskSerial(void* pvParameters){
       }
       else {
         Serial.println();
-        Serial.println("\nUngueltige Eingabe. Bitte '1' oder '2' eingeben.\n\n");
+        Serial.println("\nUngueltige Eingabe. Bitte '1', '2', '3' oder '4' eingeben.\n\n");
         Serial.print(menu);
       }
     }
