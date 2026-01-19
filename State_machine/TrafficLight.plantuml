@@ -22,8 +22,8 @@ state NightMode {
     BlinkOff --> TrafficLightRed : tick [brightness > threshold + 100]
 
     ' BlinkOn
-    BlinkOn: enter / turnOnYellowLight(); time = 0;
-    BlinkOn: exit / turnOffYellowLight();
+    BlinkOn: enter / turnOnLight(pinYellow); time = 0;
+    BlinkOn: exit / turnOffLight(pinYellow);
     BlinkOn: tick / time++;
     BlinkOn --> BlinkOff : tick [time > 1000]
     BlinkOn --> TrafficLightRed : tick [brightness > threshold + 100]
