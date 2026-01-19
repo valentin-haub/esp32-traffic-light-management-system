@@ -19,6 +19,7 @@
 
 
 TrafficLight tl1;
+TrafficLight tl2;
 
 QueueHandle_t q;
 TaskHandle_t hTrafficLight;
@@ -32,11 +33,16 @@ void taskTrafficLight(void* pvParemeters){
   TrafficLight_EventId event;
 
   TrafficLight_ctor(&tl1);
+  TrafficLight_ctor(&tl2);
 
   // Pins setzen
   tl1.vars.pinRed = PIN_RED_1;
   tl1.vars.pinYellow = PIN_YELLOW_1;
   tl1.vars.pinGreen = PIN_GREEN_1;
+
+  tl2.vars.pinRed = PIN_RED_2;
+  tl2.vars.pinYellow = PIN_YELLOW_2;
+  tl2.vars.pinGreen = PIN_GREEN_2;
 
   // Startwerte setzen
   tl1.vars.time = 0;
@@ -44,7 +50,13 @@ void taskTrafficLight(void* pvParemeters){
   tl1.vars.brightness = 4095; // Start als "hell"
   tl1.vars.threshold = 2000;
 
+  tl2.vars.time = 0;
+  tl2.vars.greenTime = 5000; // 5 Sekunden
+  tl2.vars.brightness = 4095; // Start als "hell"
+  tl2.vars.threshold = 2000;
+
   TrafficLight_start(&tl1);
+  TrafficLight_start(&tl2);
   
   while (1){
     if (xQueueReceive(q, &event, portMAX_DELAY) == pdPASS){
