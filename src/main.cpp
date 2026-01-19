@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "TrafficLight.hpp"
+#include "driver.hpp"
 
 
 // PINs
@@ -16,6 +17,11 @@
 
 #define PIN_LDR 12
 #define PIN_POTI 13
+
+#define PIN_BI_0 32
+#define PIN_BI_1 33
+#define PIN_BI_2 25
+#define PIN_BI_3 26
 
 
 TrafficLight tl1;
@@ -223,6 +229,8 @@ void taskSensors(void* pvParameters){
   pinMode(PIN_LDR, INPUT);
   pinMode(PIN_POTI, INPUT);
 
+  initBinaryDisplay(PIN_BI_0, PIN_BI_1, PIN_BI_2, PIN_BI_3);
+
   while(1){
     // Brightness aktualisieren
     int ldrValue = analogRead(PIN_LDR);
@@ -235,6 +243,9 @@ void taskSensors(void* pvParameters){
     int greenTime = map(potiValue, 0, 4095, 1000, 10000); // 1 - 10 Sekunden
     tl1.vars.greenTime = greenTime;
     tl2.vars.greenTime = greenTime;
+
+    int displayValue = map(greenTime, 1000, 10000, 0, 15);
+    refreshBinaryDisplay(displayValue, PIN_BI_0, PIN_BI_1, PIN_BI_2, PIN_BI_3);
 
 
     vTaskDelay(pdMS_TO_TICKS(200));
