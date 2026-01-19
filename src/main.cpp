@@ -198,7 +198,7 @@ void taskSerial(void* pvParameters){
           }
         }
         else if (input == '3'){
-          int greenTime = tl1.vars.greenTime / 1000;
+          float greenTime = tl1.vars.greenTime / 1000.0;
           Serial.print("Die Dauer der Grünphasen beträgt: ");
           Serial.print(greenTime);
           Serial.print(" Sek.");
