@@ -36,7 +36,7 @@ This project includes a fully configured **Wokwi Simulation**. You can run and t
 
 The simulation uses the compiled firmware directly from the `.pio` folder.
 
-![Wokwi Setup](doc/Wokwi_setup_multi.png)
+![Wokwi Setup](doc/Wokwi_multi_binaryDisplay.png)
 
 ## Software Architecture
 
