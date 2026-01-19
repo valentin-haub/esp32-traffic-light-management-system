@@ -7,12 +7,12 @@
 #define PIN_YELLOW_1 4
 #define PIN_GREEN_1 2
 
-#define PIN_RED_2 0
-#define PIN_YELLOW_2 0
-#define PIN_GREEN_2 0
+#define PIN_RED_2 25
+#define PIN_YELLOW_2 26
+#define PIN_GREEN_2 27
 
 #define PIN_REQUEST_1 15
-#define PIN_REQUEST_2 0
+#define PIN_REQUEST_2 14
 
 #define PIN_LDR 12
 #define PIN_POTI 13
