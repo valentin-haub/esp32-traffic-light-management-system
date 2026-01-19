@@ -21,7 +21,9 @@
 TrafficLight tl1;
 TrafficLight tl2;
 
-QueueHandle_t q;
+QueueHandle_t q1;
+QueueHandle_t q2;
+
 TaskHandle_t hTrafficLight1;
 TaskHandle_t hTrafficLight2;
 TaskHandle_t hRequest;
@@ -49,7 +51,7 @@ void taskTrafficLight1(void* pvParemeters){
   TrafficLight_start(&tl1);
   
   while (1){
-    if (xQueueReceive(q, &event, portMAX_DELAY) == pdPASS){
+    if (xQueueReceive(q1, &event, portMAX_DELAY) == pdPASS){
       TrafficLight_dispatch_event(&tl1, event);
     }
   }
@@ -74,7 +76,7 @@ void taskTrafficLight2(void* pvParemeters){
   TrafficLight_start(&tl2);
   
   while (1){
-    if (xQueueReceive(q, &event, portMAX_DELAY) == pdPASS){
+    if (xQueueReceive(q1, &event, portMAX_DELAY) == pdPASS){
       TrafficLight_dispatch_event(&tl1, event);
     }
   }
@@ -91,7 +93,7 @@ void taskRequest(void* pvParameters){
 
     if (lastRequestState == HIGH && currentRequestState == LOW) {
       TrafficLight_EventId request = TrafficLight_EventId_REQUESTGREEN;
-      xQueueSend(q, &request, 0);
+      xQueueSend(q1, &request, 0);
     }
     lastRequestState = currentRequestState;
 
@@ -103,7 +105,7 @@ void taskClock(void* pvParameters){
   TrafficLight_EventId tick = TrafficLight_EventId_TICK;
 
   while(1){
-    xQueueSend(q, &tick, 0);
+    xQueueSend(q1, &tick, 0);
 
     vTaskDelay(pdMS_TO_TICKS(1));
   }
@@ -135,7 +137,7 @@ void taskSerial(void* pvParameters){
         }
         else if (input == '2'){
           TrafficLight_EventId request = TrafficLight_EventId_REQUESTGREEN;
-          xQueueSend(q, &request, 0);
+          xQueueSend(q1, &request, 0);
           Serial.print("Request wurde gesetzt.");
         }
 
@@ -187,7 +189,8 @@ void taskSensors(void* pvParameters){
 void setup() {
   Serial.begin(115200);
 
-  q = xQueueCreate(20, sizeof(TrafficLight_EventId));
+  q1 = xQueueCreate(20, sizeof(TrafficLight_EventId));
+  q2 = xQueueCreate(20, sizeof(TrafficLight_EventId));
 
   xTaskCreate(taskClock, "Clock Task", 1024, NULL, 3, &hClock);
   xTaskCreate(taskTrafficLight1, "TrafficLight1 Task", 2048, NULL, 2, &hTrafficLight1);
