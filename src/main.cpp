@@ -266,8 +266,8 @@ void taskSensors(void* pvParameters){
     tl2.vars.greenTime = greenTime;
 
     // Grünphase Status-LEDs aktualisieren
-    int displayValue = map(greenTime, 1000, 10000, 0, 15);
-    refreshBinaryDisplay(displayValue, PIN_BI_0, PIN_BI_1, PIN_BI_2, PIN_BI_3);
+    int statusValue = map(greenTime, 1000, 10000, 0, 15);
+    refreshBinaryStatus(statusValue, PIN_BI_0, PIN_BI_1, PIN_BI_2, PIN_BI_3);
 
 
     // Schranken-Steuerung

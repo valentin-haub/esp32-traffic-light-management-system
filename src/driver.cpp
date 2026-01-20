@@ -34,7 +34,7 @@ void initBinaryDisplay(uint8_t p0, uint8_t p1, uint8_t p2, uint8_t p3){
     digitalWrite(p3, LOW);
 }
 
-void refreshBinaryDisplay(uint8_t value, uint8_t p0, uint8_t p1, uint8_t p2, uint8_t p3){
+void refreshBinaryStatus(uint8_t value, uint8_t p0, uint8_t p1, uint8_t p2, uint8_t p3){
     digitalWrite(p0, (value & 0x01) ? HIGH : LOW);
     digitalWrite(p1, (value & 0x02) ? HIGH : LOW);
     digitalWrite(p2, (value & 0x04) ? HIGH : LOW);
