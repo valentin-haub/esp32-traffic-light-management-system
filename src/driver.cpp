@@ -67,7 +67,7 @@ float getBarrierInclination(){
 // Winkel im Servo-Motor einstellen
 void setBarrierServo(int angle){
     if (angle < 0) angle = 0;
-    if (angle > 180) angle = 180;
+    if (angle > 90) angle = 90;
     barrierServo.write(angle);
 };
 
@@ -102,10 +102,10 @@ void showStatus(float inclination, int angle, bool barrierIsSafe){
     
     // Status anzeigen
     if (barrierIsSafe) {
-        display.println("GESCHLOSSEN"); // Sicher für Autos (Grün möglich)
+        display.println("GESCHLOSSEN");
     } else {
-        display.println("OFFEN / BEWEGUNG"); // Unsicher
+        display.println("OFFEN");
     }
 
-    display.display(); // WICHTIG: Puffer senden
+    display.display();
 }

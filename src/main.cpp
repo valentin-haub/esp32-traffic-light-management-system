@@ -275,8 +275,8 @@ void taskSensors(void* pvParameters){
     // Auslesen der Neigung des Hebels und Berechnen der Neigung
     float inclination = getBarrierInclination(); // Neigung Y-Achse
 
-    int targetAngle = map((int)(inclination * 10), -98, 98, 0, 180); // -9,8 - 9,8 --> 0 - 180
-    targetAngle = constrain(targetAngle, 0, 180); // Begrenzung
+    int targetAngle = map((int)(inclination * 10), 0, 98, 0, 180); // 0 - 9.8 --> 0 - 90
+    targetAngle = constrain(targetAngle, 0, 90); // Begrenzung
 
     // Anzeigen auf dem Display
     showStatus(inclination, targetAngle, tl1.vars.barrierActive);
