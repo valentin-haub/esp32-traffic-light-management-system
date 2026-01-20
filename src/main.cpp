@@ -58,6 +58,7 @@ void taskTrafficLight1(void* pvParemeters){
   tl1.vars.greenTime = 5000; // 5 Sekunden
   tl1.vars.brightness = 4095; // Start als "hell"
   tl1.vars.threshold = 2000;
+  tl1.vars.barrierActive = false;
 
   TrafficLight_start(&tl1);
   
@@ -83,6 +84,7 @@ void taskTrafficLight2(void* pvParemeters){
   tl2.vars.greenTime = 5000; // 5 Sekunden
   tl2.vars.brightness = 4095; // Start als "hell"
   tl2.vars.threshold = 2000;
+  tl2.vars.barrierActive = false;
 
   TrafficLight_start(&tl2);
   
@@ -245,6 +247,7 @@ void taskSensors(void* pvParameters){
 
   initBarrierSystem(PIN_SERVO, PIN_I2C_SDA, PIN_I2C_SCL);
   unsigned long barrierClosedTimestamp = 0;
+  bool wasBarrierOpen = true;
 
   while(1){
     // Brightness aktualisieren
@@ -259,8 +262,43 @@ void taskSensors(void* pvParameters){
     tl1.vars.greenTime = greenTime;
     tl2.vars.greenTime = greenTime;
 
+    // Grünphase Status-LEDs aktualisieren
     int displayValue = map(greenTime, 1000, 10000, 0, 15);
     refreshBinaryDisplay(displayValue, PIN_BI_0, PIN_BI_1, PIN_BI_2, PIN_BI_3);
+
+    // Schranken-Steuerung
+    float inclination = getBarrierInclination();
+
+    int targetAngle = map((int)(inclination * 10), -98, 98, 0, 180); // -9,8 - 9,8 --> 0 - 180
+    targetAngle = constrain(targetAngle, 0, 180); // Begrenzung
+
+    bool isAmpelRed = (tl1.state_id == TrafficLight_StateId_TRAFFICLIGHTRED);
+    if (isAmpelRed) {
+        setBarrierServo(targetAngle);
+    } else {
+        setBarrierServo(0);
+        targetAngle = 0;
+    }
+
+    bool isBarrierClosed = (targetAngle < 5);
+
+    if (!isBarrierClosed) {
+      wasBarrierOpen = true;
+      tl1.vars.barrierActive = false;
+    } 
+    else {
+      if (wasBarrierOpen) {
+        barrierClosedTimestamp = millis(); // Stoppuhr starten
+        wasBarrierOpen = false;
+      }
+
+      // Check für den 4 Sekunden Guard
+      if (millis() - barrierClosedTimestamp > 4000) {
+        tl1.vars.barrierActive = true;
+      } else {
+        tl1.vars.barrierActive = false;
+      }
+    }
 
 
     vTaskDelay(pdMS_TO_TICKS(200));
