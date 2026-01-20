@@ -39,7 +39,7 @@ state NightMode {
 TrafficLightRed: enter / turnOnLight(pinRed); time = 0;
 TrafficLightRed: exit  / turnOffLight(pinRed);
 TrafficLightRed: tick / time++;
-TrafficLightRed --> TrafficLightRedYellow : requestGreen
+TrafficLightRed --> TrafficLightRedYellow : requestGreen [barrierActive]
 TrafficLightRed --> NightMode : tick [brightness < threshold - 100]
 
 ' TrafficLightRedYellow
@@ -80,6 +80,7 @@ AutoExpandedVars = """
     uint16_t greenTime;
     uint16_t brightness;
     uint16_t threshold;
+    bool barrierActive;
     """
 
 [RenderConfig.C]
