@@ -32,4 +32,4 @@ void setBarrierServo(int angle);
 
 // Display
 void initDisplay();
-void showStatus(float inclination, bool barrierIsSafe);
+void showStatus(float inclination, int angle, bool barrierIsSafe);
