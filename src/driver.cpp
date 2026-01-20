@@ -110,7 +110,7 @@ void showStatus(float inclination, int angle, bool barrierClosed, long remaining
         } else {
             display.print("WARTEN (");
             display.print(remainingTime / 1000.0, 1); // 1 Nachkommastelle
-            display.println(" Sek.)");
+            display.println(" s)");
         }
     }
 
