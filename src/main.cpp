@@ -295,6 +295,7 @@ void taskSensors(void* pvParameters){
     if (!isBarrierClosed) {
       wasBarrierOpen = true;
       tl1.vars.barrierActive = false;
+      tl2.vars.barrierActive = false;
     } 
     else {
       if (wasBarrierOpen) {
@@ -305,8 +306,10 @@ void taskSensors(void* pvParameters){
       // Check für den 4 Sekunden Guard
       if (millis() - barrierClosedTimestamp > 4000) {
         tl1.vars.barrierActive = true;
+        tl2.vars.barrierActive = true;
       } else {
         tl1.vars.barrierActive = false;
+        tl2.vars.barrierActive = false;
       }
     }
 
