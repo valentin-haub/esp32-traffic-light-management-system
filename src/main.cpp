@@ -320,7 +320,7 @@ void taskSensors(void* pvParameters){
     showStatus(inclination, targetAngle, isBarrierClosed, remainingTime);
 
 
-    vTaskDelay(pdMS_TO_TICKS(50));
+    vTaskDelay(pdMS_TO_TICKS(100));
   }
 }
 
