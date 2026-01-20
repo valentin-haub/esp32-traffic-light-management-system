@@ -23,6 +23,10 @@
 #define PIN_BI_2 25
 #define PIN_BI_3 26
 
+#define PIN_I2C_SDA 99
+#define PIN_I2C_SCL 99
+#define PIN_SERVO 99
+
 
 TrafficLight tl1;
 TrafficLight tl2;
@@ -238,6 +242,9 @@ void taskSensors(void* pvParameters){
   pinMode(PIN_POTI, INPUT);
 
   initBinaryDisplay(PIN_BI_0, PIN_BI_1, PIN_BI_2, PIN_BI_3);
+
+  initBarrierSystem(PIN_SERVO, PIN_I2C_SDA, PIN_I2C_SCL);
+  unsigned long barrierClosedTimestamp = 0;
 
   while(1){
     // Brightness aktualisieren
