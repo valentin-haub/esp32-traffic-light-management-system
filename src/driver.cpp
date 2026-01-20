@@ -95,7 +95,8 @@ void showStatus(float inclination, int angle, bool barrierIsSafe){
 
     display.println(" m/s^2");
     display.print("Winkel: ");
-    display.println(angle);
+    display.print(angle);
+    display.println("°");
     
     display.println("");
     display.print("Status:  ");
