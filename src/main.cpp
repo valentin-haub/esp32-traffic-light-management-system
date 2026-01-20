@@ -312,7 +312,7 @@ void taskSensors(void* pvParameters){
       } else {
         tl1.vars.barrierActive = false;
         tl2.vars.barrierActive = false;
-        remainingTime -= 4000 - elapsed;
+        remainingTime = 4000 - elapsed;
       }
     }
 
