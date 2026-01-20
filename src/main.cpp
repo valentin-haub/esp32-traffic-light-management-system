@@ -1,8 +1,4 @@
 #include <Arduino.h>
-#include <Wire.h>
-#include <Adafruit_MPU6050.h>
-#include <Adafruit_Sensor.h>
-#include <ESP32Servo.h>
 #include "TrafficLight.hpp"
 #include "driver.hpp"
 
@@ -45,9 +41,6 @@ TaskHandle_t hRequest2;
 TaskHandle_t hClock;
 TaskHandle_t hSerial;
 TaskHandle_t hSensors;
-
-Adafruit_MPU6050 mpu;
-Servo barrierServo;
 
 
 void taskTrafficLight1(void* pvParemeters){
@@ -253,6 +246,8 @@ void taskSensors(void* pvParameters){
   initBinaryDisplay(PIN_BI_0, PIN_BI_1, PIN_BI_2, PIN_BI_3);
 
   initBarrierSystem(PIN_SERVO, PIN_I2C_SDA, PIN_I2C_SCL);
+
+
   unsigned long barrierClosedTimestamp = 0;
   bool wasBarrierOpen = true;
 
@@ -277,20 +272,19 @@ void taskSensors(void* pvParameters){
     // Schranken-Steuerung
 
     // Auslesen der Neigung des Hebels
-    sensors_event_t a, g, temp;
-    mpu.getEvent(&a, &g, &temp);
-    float inclination = a.acceleration.y; // Neigung Y-Achse
+    float inclination = getBarrierInclination(); // Neigung Y-Achse
 
-    // Einstellen des Servo-Motors
+    // Berechnen der Neigung
     int targetAngle = map((int)(inclination * 10), -98, 98, 0, 180); // -9,8 - 9,8 --> 0 - 180
     targetAngle = constrain(targetAngle, 0, 180); // Begrenzung
-
+    
+    // Einstellen des Servo-Motors
     bool isAmpelRed = (tl1.state_id == TrafficLight_StateId_TRAFFICLIGHTRED);
     if (isAmpelRed) {
-        barrierServo.write(targetAngle);
+      setBarrierServo(targetAngle);
     } else {
-        setBarrierServo(0);
-        targetAngle = 0;
+      setBarrierServo(0);
+      targetAngle = 0;
     }
 
     bool isBarrierClosed = (targetAngle < 5);
