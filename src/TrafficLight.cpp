@@ -454,7 +454,8 @@ static void TRAFFICLIGHTRED_exit(TrafficLight* sm)
 static void TRAFFICLIGHTRED_requestgreen(TrafficLight* sm)
 {
     // TrafficLightRed behavior
-    // uml: requestGreen TransitionTo(TrafficLightRedYellow)
+    // uml: requestGreen [barrierActive] TransitionTo(TrafficLightRedYellow)
+    if (sm->vars.barrierActive)
     {
         // Step 1: Exit states until we reach `ROOT` state (Least Common Ancestor for transition).
         TRAFFICLIGHTRED_exit(sm);

@@ -319,7 +319,7 @@ state NightMode {
 %% See https://github.com/StateSmith/StateSmith/issues/404
 state "." as ROOT.(InitialState)
 
-TrafficLightRed --> TrafficLightRedYellow : requestGreen
+TrafficLightRed --> TrafficLightRedYellow : requestGreen [barrierActive]
 
 TrafficLightRed --> NightMode : tick [brightness < threshold - 100]
 
@@ -871,7 +871,8 @@ evaluateGuard = null;
     #TRAFFICLIGHTRED_requestgreen()
     {
         // TrafficLightRed behavior
-        // uml: requestGreen / { this.tracer?.edgeTransition("edge0"); } TransitionTo(TrafficLightRedYellow)
+        // uml: requestGreen [this.tracer?.log("🛡️ User evaluating guard: " + "barrierActive") || this.evaluateGuard("TrafficLightRed","requestGreen [barrierActive] TransitionTo(TrafficLightRedYellow)")] / { this.tracer?.edgeTransition("edge0"); } TransitionTo(TrafficLightRedYellow)
+        if (this.tracer?.log("🛡️ User evaluating guard: " + "barrierActive") || this.evaluateGuard("TrafficLightRed","requestGreen [barrierActive] TransitionTo(TrafficLightRedYellow)"))
         {
             // Step 1: Exit states until we reach `ROOT` state (Least Common Ancestor for transition).
             this.#TRAFFICLIGHTRED_exit();
