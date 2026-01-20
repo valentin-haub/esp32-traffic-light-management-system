@@ -1,9 +1,6 @@
 #include "driver.hpp"
 
 
-Adafruit_MPU6050 mpu;
-Servo barrierServo;
-
 
 void initLight(uint8_t pin) {
     pinMode(pin, OUTPUT);
@@ -54,17 +51,4 @@ void initBarrierSystem(uint8_t servoPin, uint8_t sdaPin, uint8_t sclPin) {
     // Servo starten (50Hz, 0.5ms - 2.5ms)
     barrierServo.setPeriodHertz(50);
     barrierServo.attach(servoPin, 500, 2500);
-}
-
-float getBarrierInclination() {
-    sensors_event_t a, g, temp;
-    mpu.getEvent(&a, &g, &temp);
-    return a.acceleration.y; // Neigung Y-Achse
-}
-
-void setBarrierServo(int angle) {
-    if (angle < 0) angle = 0;
-    if (angle > 180) angle = 180;
-    
-    barrierServo.write(angle);
 }
