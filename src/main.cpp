@@ -177,7 +177,7 @@ void taskSerial(void* pvParameters){
           if (tl1.state_id == TrafficLight_StateId_BLINKON || tl1.state_id == TrafficLight_StateId_BLINKOFF){
             currentState1 = "NIGHTMODE";
           }
-          if (tl2.state_id == TrafficLight_StateId_BLINKON || tl1.state_id == TrafficLight_StateId_BLINKOFF){
+          if (tl2.state_id == TrafficLight_StateId_BLINKON || tl2.state_id == TrafficLight_StateId_BLINKOFF){
             currentState2 = "NIGHTMODE";
           }
 
