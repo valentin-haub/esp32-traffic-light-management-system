@@ -28,6 +28,8 @@ Das Projekt ist für ein Standard **ESP32 Development Board** konfiguriert.
 
 ### Pin-Konfiguration (Verkabelung)
 
+**WICHTIG:** Bitte stelle sicher, dass die Pin-Definitionen in `src/main.cpp` exakt mit der Verkabelung in `simulation/diagram.json` übereinstimmen!
+
 | Komponente | GPIO Pin | Hinweis |
 | :--- | :--- | :--- |
 | **Ampel 1** | **Rot:** `23`, **Gelb:** `22`, **Grün:** `21` | |
@@ -52,6 +54,8 @@ Dieses Projekt enthält eine vollständig konfigurierte **Wokwi Simulation**.
 2. **Projekt Bauen:** Klicke auf das **Build** Icon (`✔`) in PlatformIO.
 3. Öffne `simulation/diagram.json`.
 4. Drücke `F1` und wähle **"Wokwi: Start Simulator"**.
+
+![Wokwi Setup](doc/Wokwi_5.0.png)
 
 *Hinweis: Um die Simulationsgeschwindigkeit zu optimieren, läuft der I2C-Bus im Fast-Mode (400kHz) und das Display wird mit 10Hz aktualisiert.*
 
