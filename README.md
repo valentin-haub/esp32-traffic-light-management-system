@@ -1,75 +1,91 @@
-# Traffic Management System (Dual ESP32 / FreeRTOS)
+# Traffic Management System (ESP32 / FreeRTOS)
 
-This project implements a real-time traffic light control system for **two independent intersections** on a single **ESP32** using **FreeRTOS** and state machines generated with **StateSmith**.
+Dieses Projekt implementiert eine Echtzeit-Ampelsteuerung für **zwei unabhängige Kreuzungen** auf einem einzelnen **ESP32** unter Verwendung von **FreeRTOS** und mit **StateSmith** generierten Zustandsautomaten.
 
-It features a clean **Producer-Consumer architecture**, separating business logic, timing, and user input into dedicated tasks communicating via thread-safe queues. Additionally, it visualizes the configurable green-phase duration using a **4-bit binary LED display**.
+Das System verfügt über eine saubere **Producer-Consumer-Architektur**, trennt Ampel-Logik, Timing und Benutzereingaben in dedizierte Tasks und visualisiert Statusinformationen über ein **OLED-Display** sowie eine **binäre LED-Anzeige**.
 
-*Developed as part of the **Technische Informatik 2** module.*
+*Entwickelt als Teil des Moduls **Technische Informatik 2**.*
 
 ## Features
 
-- **Dual Traffic Light Control:** Two independent state machines running in parallel.
-- **Binary Display:** 4 LEDs display the current green-phase duration (1-10s) in binary format (0-15).
-- **Night Mode:** Automatic blinking yellow mode based on LDR brightness sensor.
-- **Configurable Timing:** Potentiometer adjusts the green phase duration in real-time.
-- **Interactive Serial Menu:** Monitoring and control via UART.
+- **Duale Ampelsteuerung:** Zwei unabhängige Zustandsautomaten laufen parallel.
+- **Smarter Bahnübergang (Neu):**
+  - **Schrankensteuerung:** Ein Servo-Motor wird durch Neigen eines MPU6050 Beschleunigungssensors ("Hebel") gesteuert.
+  - **Sicherheits-Logik:** Die Ampel darf erst Grün werden, wenn die Schranke physisch geschlossen ist (< 5°) **UND** eine Sicherheitszeit von 4 Sekunden abgelaufen ist.
+  - **Interlock:** Der Servo lässt sich nur bewegen, wenn die Ampel Rot zeigt.
+- **OLED Status-Display (Neu):** Zeigt Echtzeit-Informationen an:
+  - Aktuelle Neigung & Servowinkel.
+  - Status der Schranke (OFFEN / GESCHLOSSEN).
+  - Countdown-Timer für die Sicherheitsfreigabe.
+- **Binäre Anzeige:** 4 LEDs zeigen die aktuell eingestellte Grünphasen-Dauer (1-10s) binär an (0-15).
+- **Nachtmodus:** Automatisches Gelb-Blinken basierend auf dem Helligkeitssensor (LDR).
+- **Konfigurierbares Timing:** Ein Potentiometer passt die Grünphasendauer in Echtzeit an.
+- **Interaktives Serielles Menü:** Überwachung und Steuerung via UART.
 
 ## Hardware Setup
 
-The project is configured for a standard **ESP32 Development Board**.
+Das Projekt ist für ein Standard **ESP32 Development Board** konfiguriert.
 
-### Pin Configuration (Wiring)
+### Pin-Konfiguration (Verkabelung)
 
-| Component | GPIO Pin | Note |
+| Komponente | GPIO Pin | Hinweis |
 | :--- | :--- | :--- |
-| **Traffic Light 1** | **Red:** `23`, **Yellow:** `22`, **Green:** `21` | |
-| **Traffic Light 2** | **Red:** `16`, **Yellow:** `4`, **Green:** `2` | |
-| **Button 1** (Request TL1) | `19` | Active Low (Input Pullup) |
-| **Button 2** (Request TL2) | `15` | Active Low (Input Pullup) |
-| **Binary Display (LSB)** | `32` | Bit 0 (Value 1) |
-| **Binary Display** | `33` | Bit 1 (Value 2) |
-| **Binary Display** | `25` | Bit 2 (Value 4) |
-| **Binary Display (MSB)** | `26` | Bit 3 (Value 8) |
-| **LDR (Light Sensor)** | `12` | Analog Input |
+| **Ampel 1** | **Rot:** `23`, **Gelb:** `22`, **Grün:** `21` | |
+| **Ampel 2** | **Rot:** `18`, **Gelb:** `5`, **Grün:** `17` | |
+| **Taster 1** (Request TL1) | `19` | Active Low (Input Pullup) |
+| **Taster 2** (Request TL2) | `16` | Active Low (Input Pullup) |
+| **I2C Bus** (OLED & MPU6050) | **SDA:** `27`, **SCL:** `14` | |
+| **Servo Motor** | `15` | PWM Signal |
+| **Binär-Anzeige (LSB)** | `32` | Bit 0 (Wert 1) |
+| **Binär-Anzeige** | `33` | Bit 1 (Wert 2) |
+| **Binär-Anzeige** | `25` | Bit 2 (Wert 4) |
+| **Binär-Anzeige (MSB)** | `26` | Bit 3 (Wert 8) |
+| **LDR (Lichtsensor)** | `12` | Analog Input |
 | **Potentiometer** | `13` | Analog Input |
 
 ## Simulation (Wokwi)
 
-This project includes a fully configured **Wokwi Simulation**.
+Dieses Projekt enthält eine vollständig konfigurierte **Wokwi Simulation**.
 
-**How to run:**
-1. Install the **Wokwi Simulator** extension in VS Code.
-2. **Build Project:** Click the **Build** icon (`✔`) in PlatformIO.
-3. Open `simulation/diagram.json`.
-4. Press `F1` and run **"Wokwi: Start Simulator"**.
+**Starten der Simulation:**
+1. Installiere die **Wokwi Simulator** Extension in VS Code.
+2. **Projekt Bauen:** Klicke auf das **Build** Icon (`✔`) in PlatformIO.
+3. Öffne `simulation/diagram.json`.
+4. Drücke `F1` und wähle **"Wokwi: Start Simulator"**.
 
-![Wokwi Setup](doc/Wokwi_multi_binaryDisplay.png)
+*Hinweis: Um die Simulationsgeschwindigkeit zu optimieren, läuft der I2C-Bus im Fast-Mode (400kHz) und das Display wird mit 10Hz aktualisiert.*
 
-## Software Architecture
+## Software Architektur
 
-The system uses **FreeRTOS** to handle multitasking. To ensure separation of concerns, each traffic light has its own dedicated Task and Queue.
+Das System nutzt **FreeRTOS** für Multitasking. Zur Gewährleistung der "Separation of Concerns" hat jede Ampel ihren eigenen Task und ihre eigene Queue.
 
-### Tasks & Priorities
+### Tasks & Prioritäten
 
-1. **Clock Task (Prio 3):** Generates `TICK` events every 1ms and distributes them to *both* queues (`q1`, `q2`).
-2. **TrafficLight Tasks 1 & 2 (Prio 2):** Two separate consumer tasks hosting the StateSmith logic. They process events from their respective queues.
-3. **Sensors Task (Prio 1):** Reads analog sensors (LDR, Poti), updates shared variables, and drives the **Binary Display** via the driver layer.
-4. **Request Tasks 1 & 2 (Prio 1):** Monitor the physical buttons with debouncing logic and send `REQUESTGREEN` events to the specific queue.
-5. **Serial Task (Prio 1):** Handles user interaction via UART.
+1. **Clock Task (Prio 3):** Generiert `TICK` Events alle 1ms und verteilt sie an *beide* Queues (`q1`, `q2`).
+2. **TrafficLight Tasks 1 & 2 (Prio 2):** Zwei separate Consumer-Tasks, welche die StateSmith-Logik ausführen.
+3. **Sensors Task (Prio 1):**
+   - Liest analoge Sensoren (LDR, Poti).
+   - Liest den **MPU6050** (Neigung) und steuert den **Servo**.
+   - Berechnet die **Sicherheits-Guard-Logik** (4s Timer).
+   - Aktualisiert das **OLED-Display** und die **Binär-LEDs** über den Treiber.
+4. **Request Tasks 1 & 2 (Prio 1):** Überwachen die Taster (Debouncing) und senden `REQUESTGREEN` Events.
+5. **Serial Task (Prio 1):** Behandelt Benutzereingaben via UART.
 
 ### State Machine
 
-The logic is generated using **StateSmith** (`TrafficLight.hpp`/`.cpp`). Both traffic light instances (`tl1`, `tl2`) share the same logic structure but operate on different data sets.
+Die Logik wird mittels **StateSmith** (`TrafficLight.hpp`/`.cpp`) generiert. Beide Ampel-Instanzen (`tl1`, `tl2`) teilen sich die gleiche Logikstruktur, arbeiten aber auf unterschiedlichen Datensätzen.
 
-## Usage / Serial Menu
+Die Transition zu Grün wird durch die Variable `barrierActive` geschützt, welche nur `true` wird, wenn die Schranke sicher geschlossen ist.
 
-Connect via Serial Monitor at **115200 baud**.
+## Bedienung / Serielles Menü
 
-- **1:** Print current states (Shows "NIGHTMODE" if active).
-- **2:** Simulate pedestrian button press for TL 1 or 2.
-- **3:** Show current green phase duration (in seconds, e.g., "4.32 Sek").
-- **4:** Show current brightness sensor value.
+Verbinde dich mit dem Serial Monitor bei **115200 Baud**.
+
+- **1:** Aktuelle Zustände ausgeben (Zeigt "NIGHTMODE" falls aktiv).
+- **2:** Fußgängeranforderung für Ampel 1 oder 2 simulieren.
+- **3:** Aktuelle Dauer der Grünphase anzeigen (in Sekunden).
+- **4:** Aktuellen Helligkeitswert anzeigen.
 
 ---
 
-**Version:** 4.0 (Dual-Instance + Binary Update)
+**Version:** 5.0 (Barrier-System & OLED Update)
