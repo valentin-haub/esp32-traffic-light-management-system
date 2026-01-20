@@ -8,12 +8,12 @@
 #define PIN_YELLOW_1 22
 #define PIN_GREEN_1 21
 
-#define PIN_RED_2 16
-#define PIN_YELLOW_2 4
-#define PIN_GREEN_2 2
+#define PIN_RED_2 18
+#define PIN_YELLOW_2 5
+#define PIN_GREEN_2 17
 
 #define PIN_REQUEST_1 19
-#define PIN_REQUEST_2 15
+#define PIN_REQUEST_2 16
 
 #define PIN_LDR 12
 #define PIN_POTI 13
@@ -23,10 +23,10 @@
 #define PIN_BI_2 25
 #define PIN_BI_3 26
 
-#define PIN_SERVO 99
+#define PIN_SERVO 15
 
-#define PIN_I2C_SDA 99
-#define PIN_I2C_SCL 99
+#define PIN_I2C_SDA 27
+#define PIN_I2C_SCL 14
 
 
 TrafficLight tl1;
