@@ -327,7 +327,7 @@ void setup() {
   xTaskCreate(taskRequest1, "Request1 Task", 2048, NULL, 1, &hRequest1);
   xTaskCreate(taskRequest2, "Request2 Task", 2048, NULL, 1, &hRequest2);
   xTaskCreate(taskSerial, "Serial Task", 4096, NULL, 1, &hSerial);
-  xTaskCreate(taskSensors, "Sensors Task", 1024, NULL, 1, &hSensors);
+  xTaskCreate(taskSensors, "Sensors Task", 2048, NULL, 1, &hSensors);
 }
 
 
