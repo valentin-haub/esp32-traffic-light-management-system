@@ -44,6 +44,7 @@ void refreshBinaryStatus(uint8_t value, uint8_t p0, uint8_t p1, uint8_t p2, uint
 
 void initBarrierSystem(uint8_t servoPin, uint8_t sdaPin, uint8_t sclPin){
     Wire.begin(sdaPin, sclPin); // I2C Bus starten
+    Wire.setClock(400000); // 400 kHz
 
     // MPU6050 starten
     if (!mpu.begin()) {
