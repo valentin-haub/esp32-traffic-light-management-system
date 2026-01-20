@@ -336,10 +336,10 @@ void setup() {
   xTaskCreate(taskTrafficLight1, "TrafficLight1 Task", 2048, NULL, 2, &hTrafficLight1);
   xTaskCreate(taskTrafficLight2, "TrafficLight2 Task", 2048, NULL, 2, &hTrafficLight2);
 
+  xTaskCreate(taskSensors, "Sensors Task", 2048, NULL, 2, &hSensors);
   xTaskCreate(taskRequest1, "Request1 Task", 2048, NULL, 1, &hRequest1);
   xTaskCreate(taskRequest2, "Request2 Task", 2048, NULL, 1, &hRequest2);
   xTaskCreate(taskSerial, "Serial Task", 4096, NULL, 1, &hSerial);
-  xTaskCreate(taskSensors, "Sensors Task", 2048, NULL, 1, &hSensors);
 }
 
 
