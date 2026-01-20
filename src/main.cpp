@@ -244,8 +244,8 @@ void taskSensors(void* pvParameters){
   pinMode(PIN_POTI, INPUT);
 
   initBinaryDisplay(PIN_BI_0, PIN_BI_1, PIN_BI_2, PIN_BI_3);
-
   initBarrierSystem(PIN_SERVO, PIN_I2C_SDA, PIN_I2C_SCL);
+  initDisplay();
 
 
   unsigned long barrierClosedTimestamp = 0;
@@ -276,6 +276,9 @@ void taskSensors(void* pvParameters){
 
     int targetAngle = map((int)(inclination * 10), -98, 98, 0, 180); // -9,8 - 9,8 --> 0 - 180
     targetAngle = constrain(targetAngle, 0, 180); // Begrenzung
+
+    // Anzeigen auf dem Display
+    showStatus(inclination, targetAngle, tl1.vars.barrierActive);
     
     // Einstellen des Servo-Motors
     bool isAmpelRed = (tl1.state_id == TrafficLight_StateId_TRAFFICLIGHTRED);
