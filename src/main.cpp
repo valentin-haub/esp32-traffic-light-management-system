@@ -23,9 +23,10 @@
 #define PIN_BI_2 25
 #define PIN_BI_3 26
 
+#define PIN_SERVO 99
+
 #define PIN_I2C_SDA 99
 #define PIN_I2C_SCL 99
-#define PIN_SERVO 99
 
 
 TrafficLight tl1;
