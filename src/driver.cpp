@@ -81,7 +81,7 @@ void initDisplay(){
     display.display();
 }
 
-void showStatus(float inclination, int angle, bool barrierIsSafe){
+void showStatus(float inclination, int angle, bool barrierClosed, long remainingTime){
     display.clearDisplay();
     display.setTextSize(1);
     display.setTextColor(SSD1306_WHITE);
@@ -99,13 +99,19 @@ void showStatus(float inclination, int angle, bool barrierIsSafe){
     display.println((char)247);
     
     display.println("");
-    display.print("Status:  ");
+    display.print("Status: ");
     
     // Status anzeigen
-    if (barrierIsSafe) {
-        display.println("GESCHLOSSEN");
-    } else {
+    if (!barrierClosed) {
         display.println("OFFEN");
+    } else {
+        if (remainingTime == 0){
+            display.println("OFFEN");
+        } else {
+            display.print("WARTEN (");
+            display.print(remainingTime / 1000);
+            display.println(" Sek.)");
+        }
     }
 
     display.display();

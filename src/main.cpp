@@ -277,9 +277,6 @@ void taskSensors(void* pvParameters){
 
     int targetAngle = map((int)(inclination * 10), 0, 98, 0, 90); // 0 - 9.8 --> 0 - 90
     targetAngle = constrain(targetAngle, 0, 90); // Begrenzung
-
-    // Anzeigen auf dem Display
-    showStatus(inclination, targetAngle, tl1.vars.barrierActive);
     
     // Einstellen des Servo-Motors
     bool isAmpelRed = (tl1.state_id == TrafficLight_StateId_TRAFFICLIGHTRED);
@@ -291,11 +288,13 @@ void taskSensors(void* pvParameters){
     }
 
     bool isBarrierClosed = (targetAngle < 5);
+    long remainingTime = 0;
 
     if (!isBarrierClosed) {
       wasBarrierOpen = true;
       tl1.vars.barrierActive = false;
       tl2.vars.barrierActive = false;
+      remainingTime = 0;
     } 
     else {
       if (wasBarrierOpen) {
@@ -303,15 +302,22 @@ void taskSensors(void* pvParameters){
         wasBarrierOpen = false;
       }
 
+      unsigned long elapsed = millis() - barrierClosedTimestamp;
+
       // Check für den 4 Sekunden Guard
-      if (millis() - barrierClosedTimestamp > 4000) {
+      if (elapsed > 4000) {
         tl1.vars.barrierActive = true;
         tl2.vars.barrierActive = true;
+        remainingTime = 0;
       } else {
         tl1.vars.barrierActive = false;
         tl2.vars.barrierActive = false;
+        remainingTime -= 4000 - elapsed;
       }
     }
+
+    // Anzeigen auf dem Display
+    showStatus(inclination, targetAngle, isBarrierClosed, remainingTime);
 
 
     vTaskDelay(pdMS_TO_TICKS(50));
