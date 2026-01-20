@@ -69,7 +69,7 @@ Das System nutzt **FreeRTOS** für Multitasking. Zur Gewährleistung der "Separa
    - Berechnet die **Sicherheits-Guard-Logik** (4s Timer).
    - Aktualisiert das **OLED-Display** und die **Binär-LEDs** über den Treiber.
 4. **Request Tasks 1 & 2 (Prio 1):** Überwachen die Taster (Debouncing) und senden `REQUESTGREEN` Events.
-5. **Serial Task (Prio 1):** Behandelt Benutzereingaben via UART.
+5. **Serial Task (Prio 2):** Behandelt Benutzereingaben via UART.
 
 ### State Machine
 
