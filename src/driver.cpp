@@ -105,11 +105,11 @@ void showStatus(float inclination, int angle, bool barrierClosed, long remaining
     if (!barrierClosed) {
         display.println("OFFEN");
     } else {
-        if (remainingTime == 0){
-            display.println("OFFEN");
+        if (remainingTime <= 0){
+            display.println("GESCHLOSSEN");
         } else {
             display.print("WARTEN (");
-            display.print(remainingTime / 1000);
+            display.print(remainingTime / 1000.0, 1); // 1 Nachkommastelle
             display.println(" Sek.)");
         }
     }
