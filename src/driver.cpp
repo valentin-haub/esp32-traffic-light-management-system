@@ -3,6 +3,7 @@
 
 Adafruit_MPU6050 mpu;
 Servo barrierServo;
+Adafruit_SSD1306 display(128, 64, &Wire, -1);
 
 
 void initLight(uint8_t pin) {
@@ -69,3 +70,42 @@ void setBarrierServo(int angle){
     if (angle > 180) angle = 180;
     barrierServo.write(angle);
 };
+
+
+void initDisplay(){
+    // Adresse 0x3C für 128x64 OLED
+    if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+        Serial.println(F("SSD1306 nicht gefunden"));
+    }
+    display.clearDisplay();
+    display.display();
+}
+
+void showStatus(float inclination, int angle, bool barrierIsSafe){
+    display.clearDisplay();
+    display.setTextSize(1);
+    display.setTextColor(SSD1306_WHITE);
+    
+    display.setCursor(0, 0);
+
+    display.println(">> SCHRANKE <<");
+    display.println("-------------------");
+    display.print("Neigung: ");
+    display.print(inclination, 1); // 1 Nachkommastelle
+
+    display.println(" m/s^2");
+    display.print("Winkel: ");
+    display.println(angle);
+    
+    display.println("");
+    display.print("Status:  ");
+    
+    // Status anzeigen
+    if (barrierIsSafe) {
+        display.println("GESCHLOSSEN"); // Sicher für Autos (Grün möglich)
+    } else {
+        display.println("OFFEN / BEWEGUNG"); // Unsicher
+    }
+
+    display.display(); // WICHTIG: Puffer senden
+}

@@ -5,6 +5,8 @@
 #include <Adafruit_MPU6050.h>
 #include <Adafruit_Sensor.h>
 #include <ESP32Servo.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 
 
 void initLight(uint8_t pin);
@@ -27,3 +29,7 @@ float getBarrierInclination();
 
 // Winkel im Servo-Motor einstellen
 void setBarrierServo(int angle);
+
+// Display
+void initDisplay();
+void showStatus(float inclination, bool barrierIsSafe);
